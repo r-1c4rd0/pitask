@@ -16,13 +16,13 @@ import 'auth_service.dart';
 class FireBaseMessagingService extends GetxService {
   Future<FireBaseMessagingService> init() async {
     FirebaseMessaging.instance.requestPermission(sound: true, badge: true, alert: true);
-    await fcmOnLaunchListeners();
-    await fcmOnResumeListeners();
-    await fcmOnMessageListeners();
+    await _fcmOnLaunchListeners();
+    await _fcmOnResumeListeners();
+    await _fcmOnMessageListeners();
     return this;
   }
 
-  Future fcmOnMessageListeners() async {
+  Future<void> _fcmOnMessageListeners() async {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (Get.isRegistered<RootController>()) {
         Get.find<RootController>().getNotificationsCount();
@@ -35,14 +35,14 @@ class FireBaseMessagingService extends GetxService {
     });
   }
 
-  Future fcmOnLaunchListeners() async {
-    RemoteMessage message = await FirebaseMessaging.instance.getInitialMessage();
+  Future<void> _fcmOnLaunchListeners() async {
+    RemoteMessage? message = await FirebaseMessaging.instance.getInitialMessage();
     if (message != null) {
       _notificationsBackground(message);
     }
   }
 
-  Future fcmOnResumeListeners() async {
+  Future<void> _fcmOnResumeListeners() async {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       _notificationsBackground(message);
     });
@@ -56,96 +56,90 @@ class FireBaseMessagingService extends GetxService {
     }
   }
 
-  void _newBookingNotificationBackground(message) {
+  void _newBookingNotificationBackground(RemoteMessage message) {
     if (Get.isRegistered<RootController>()) {
-      Get.toNamed(Routes.BOOKING, arguments: new Booking(id: message.data['bookingId']));
+      Get.toNamed(Routes.BOOKING, arguments: Booking(id: message.data['bookingId']));
     }
   }
 
   void _newMessageNotificationBackground(RemoteMessage message) {
     if (message.data['messageId'] != null) {
-      Get.toNamed(Routes.CHAT, arguments: new Message([], id: message.data['messageId']));
+      Get.toNamed(Routes.CHAT, arguments: Message([], id: message.data['messageId']));
     }
   }
 
   Future<void> setDeviceToken() async {
-    Get.find<AuthService>().user.value.deviceToken = await FirebaseMessaging.instance.getToken();
+    Get.find<AuthService>().user.value.deviceToken = (await FirebaseMessaging.instance.getToken())!;
   }
 
   void _bookingNotification(RemoteMessage message) {
-    if (Get.currentRoute == Routes.ROOT) {
+    if (Get.currentRoute == Routes.ROOT && Get.isRegistered<HomeController>()) {
       Get.find<HomeController>().refreshHome();
     }
-    if (Get.currentRoute == Routes.BOOKING) {
+    if (Get.currentRoute == Routes.BOOKING && Get.isRegistered<BookingController>()) {
       Get.find<BookingController>().refreshBooking();
     }
-    RemoteNotification notification = message.notification;
-    Get.showSnackbar(Ui.notificationSnackBar(
-      title: notification.title,
-      message: notification.body,
-      mainButton: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        width: 52,
-        height: 52,
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(5)),
-          child: CachedNetworkImage(
-            width: double.infinity,
-            fit: BoxFit.cover,
-            imageUrl: message.data != null ? message.data['icon'] : "",
-            placeholder: (context, url) => Image.asset(
-              'assets/img/loading.gif',
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
-            errorWidget: (context, url, error) => Icon(Icons.error_outline),
-          ),
-        ),
-      ),
+
+    RemoteNotification? notification = message.notification;
+    if (notification == null) return;
+
+    Get.showSnackbar(Ui.SuccessSnackBar(
+      title: notification.title ?? "Nova Notificação",
+      message: notification.body ?? "Você recebeu uma nova atualização.",
+
+      /*mainButton: _buildNotificationIcon(message.data['icon']),
       onTap: (getBar) async {
         if (message.data['bookingId'] != null) {
           await Get.back();
-          Get.toNamed(Routes.BOOKING, arguments: new Booking(id: message.data['bookingId']));
+          Get.toNamed(Routes.BOOKING, arguments: Booking(id: message.data['bookingId']));
         }
-      },
+      },*/
     ));
   }
 
   void _newMessageNotification(RemoteMessage message) {
-    RemoteNotification notification = message.notification;
-    if (Get.find<MessagesController>().initialized) {
+    RemoteNotification? notification = message.notification;
+    if (notification == null) return;
+
+    if (Get.isRegistered<MessagesController>() && Get.find<MessagesController>().initialized) {
       Get.find<MessagesController>().refreshMessages();
     }
+
     if (Get.currentRoute != Routes.CHAT) {
-      Get.showSnackbar(Ui.notificationSnackBar(
-        title: notification.title,
-        message: notification.body,
-        mainButton: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8.0),
-          width: 42,
-          height: 42,
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(42)),
-            child: CachedNetworkImage(
-              width: double.infinity,
-              fit: BoxFit.cover,
-              imageUrl: message.data != null ? message.data['icon'] : "",
-              placeholder: (context, url) => Image.asset(
-                'assets/img/loading.gif',
-                fit: BoxFit.cover,
-                width: double.infinity,
-              ),
-              errorWidget: (context, url, error) => Icon(Icons.error_outline),
-            ),
-          ),
-        ),
+      Get.showSnackbar(Ui.SuccessSnackBar(
+        title: notification.title ?? "Nova Mensagem",
+        message: notification.body ?? "Você recebeu uma nova mensagem.",
+
+        /*mainButton: _buildNotificationIcon(message.data['icon']),
         onTap: (getBar) async {
           if (message.data['messageId'] != null) {
             await Get.back();
-            Get.toNamed(Routes.CHAT, arguments: new Message([], id: message.data['messageId']));
+            Get.toNamed(Routes.CHAT, arguments: Message([], id: message.data['messageId']));
           }
-        },
+        },*/
       ));
     }
+  }
+
+  Widget _buildNotificationIcon(String? imageUrl) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      width: 52,
+      height: 52,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(5)),
+        child: CachedNetworkImage(
+          width: double.infinity,
+          fit: BoxFit.cover,
+          imageUrl: imageUrl ?? "",
+          placeholder: (context, url) => Image.asset(
+            'assets/img/loading.gif',
+            fit: BoxFit.cover,
+            width: double.infinity,
+          ),
+          errorWidget: (context, url, error) => const Icon(Icons.error_outline),
+        ),
+      ),
+    );
   }
 }

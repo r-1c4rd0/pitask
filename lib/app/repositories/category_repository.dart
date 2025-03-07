@@ -4,21 +4,17 @@ import '../models/category_model.dart';
 import '../providers/laravel_provider.dart';
 
 class CategoryRepository {
-  LaravelApiClient _laravelApiClient;
+  final LaravelApiClient _laravelApiClient = Get.find<LaravelApiClient>();
 
-  CategoryRepository() {
-    this._laravelApiClient = Get.find<LaravelApiClient>();
+  Future<List<Category>> getAll() async {
+    return await _laravelApiClient.getAllCategories();
   }
 
-  Future<List<Category>> getAll() {
-    return _laravelApiClient.getAllCategories();
+  Future<List<Category>> getAllParents() async {
+    return await _laravelApiClient.getAllParentCategories();
   }
 
-  Future<List<Category>> getAllParents() {
-    return _laravelApiClient.getAllParentCategories();
-  }
-
-  Future<List<Category>> getAllWithSubCategories() {
-    return _laravelApiClient.getAllWithSubCategories();
+  Future<List<Category>> getAllWithSubCategories() async {
+    return await _laravelApiClient.getAllWithSubCategories();
   }
 }

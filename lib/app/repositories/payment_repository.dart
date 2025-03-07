@@ -8,11 +8,8 @@ import '../models/wallet_transaction_model.dart';
 import '../providers/laravel_provider.dart';
 
 class PaymentRepository {
-  LaravelApiClient _laravelApiClient;
+  final LaravelApiClient _laravelApiClient = Get.find<LaravelApiClient>();
 
-  PaymentRepository() {
-    _laravelApiClient = Get.find<LaravelApiClient>();
-  }
 
   Future<List<PaymentMethod>> getMethods() {
     return _laravelApiClient.getPaymentMethods();

@@ -10,60 +10,59 @@ import '../app/services/settings_service.dart';
 import 'ui.dart';
 
 class Helper {
-  DateTime currentBackPressTime;
+  DateTime? currentBackPressTime;
 
   static Future<dynamic> getJsonFile(String path) async {
     return rootBundle.loadString(path).then(convert.jsonDecode);
   }
 
-  static Future<dynamic> getFilesInDirectory(String path) async {
-    var files = io.Directory(path).listSync();
-    print(files);
-    // return rootBundle.(path).then(convert.jsonDecode);
+  static List<String> getFilesInDirectory(String path) {
+    try {
+      return io.Directory(path).listSync().map((e) => e.path).toList();
+    } catch (e) {
+      print("Erro ao listar diretório: $e");
+      return [];
+    }
   }
 
   static String toUrl(String path) {
-    if (!path.endsWith('/')) {
-      path += '/';
-    }
-    return path;
+    return path.endsWith('/') ? path : '$path/';
   }
 
   static String toApiUrl(String path) {
-    path = toUrl(path);
-    if (!path.endsWith('/')) {
-      path += '/';
-    }
-    return path;
+    return toUrl(path);
   }
 
-  Future<bool> onWillPop() {
+  Future<bool> onWillPop() async {
     DateTime now = DateTime.now();
-    if (currentBackPressTime == null || now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+    if (currentBackPressTime == null || now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
       currentBackPressTime = now;
-      Get.showSnackbar(Ui.defaultSnackBar(message: "Tap again to leave!".tr));
+     // Get.showSnackbar(Ui.defaultSnackBar(message: "Tap again to leave!".tr));
       return Future.value(false);
     }
-    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    if (io.Platform.isAndroid) {
+      SystemNavigator.pop(); // Alternativa: exit(0);
+    }
     return Future.value(true);
   }
 
-  static PhoneNumber getPhoneNumber(String _phoneNumber) {
-    if (_phoneNumber != null && _phoneNumber.length > 4) {
-      _phoneNumber = _phoneNumber.replaceAll(' ', '');
-      String dialCode1 = _phoneNumber.substring(1, 2);
-      String dialCode2 = _phoneNumber.substring(1, 3);
-      String dialCode3 = _phoneNumber.substring(1, 4);
-      for (int i = 0; i < countries.length; i++) {
-        if (countries[i].dialCode == dialCode1) {
-          return new PhoneNumber(countryISOCode: countries[i].code, countryCode: dialCode1, number: _phoneNumber.substring(2));
-        } else if (countries[i].dialCode == dialCode2) {
-          return new PhoneNumber(countryISOCode: countries[i].code, countryCode: dialCode2, number: _phoneNumber.substring(3));
-        } else if (countries[i].dialCode == dialCode3) {
-          return new PhoneNumber(countryISOCode: countries[i].code, countryCode: dialCode3, number: _phoneNumber.substring(4));
+  static PhoneNumber getPhoneNumber(String? phoneNumber) {
+    if (phoneNumber != null && phoneNumber.length > 4) {
+      phoneNumber = phoneNumber.replaceAll(' ', '');
+      for (var country in countries) {
+        if (phoneNumber.startsWith('+${country.dialCode}')) {
+          return PhoneNumber(
+            countryISOCode: country.code,
+            countryCode: country.dialCode,
+            number: phoneNumber.substring(country.dialCode.length + 1),
+          );
         }
       }
     }
-    return new PhoneNumber(countryISOCode: Get.find<SettingsService>().setting.value.defaultCountryCode, countryCode: '1', number: '');
+    return PhoneNumber(
+      countryISOCode: Get.find<SettingsService>().setting.value.defaultCountryCode ?? 'US',
+      countryCode: '1',
+      number: '',
+    );
   }
 }

@@ -5,17 +5,14 @@ import '../models/faq_model.dart';
 import '../providers/laravel_provider.dart';
 
 class FaqRepository {
-  LaravelApiClient _laravelApiClient;
+  final LaravelApiClient _laravelApiClient = Get.find<LaravelApiClient>();
 
-  FaqRepository() {
-    _laravelApiClient = Get.find<LaravelApiClient>();
+
+  Future<List<FaqCategory>> getFaqCategories() async{
+    return await _laravelApiClient.getFaqCategories();
   }
 
-  Future<List<FaqCategory>> getFaqCategories() {
-    return _laravelApiClient.getFaqCategories();
-  }
-
-  Future<List<Faq>> getFaqs(String categoryId) {
-    return _laravelApiClient.getFaqs(categoryId);
+  Future<List<Faq>> getFaqs(String categoryId) async{
+    return await _laravelApiClient.getFaqs(categoryId);
   }
 }

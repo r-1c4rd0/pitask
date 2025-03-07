@@ -6,7 +6,7 @@ import '../services/auth_service.dart';
 
 class ProviderMiddleware extends GetMiddleware {
   @override
-  RouteSettings redirect(String route) {
+  RouteSettings? redirect(String? route) {
     final authService = Get.find<AuthService>();
     if (!authService.user.value.isProvider) {
       return RouteSettings(name: Routes.E_PROVIDERS);

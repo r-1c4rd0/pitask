@@ -7,57 +7,45 @@ import '../repositories/setting_repository.dart';
 import 'settings_service.dart';
 
 class TranslationService extends GetxService {
-  final translations = Map<String, Map<String, String>>().obs;
+  final translations = <String, Map<String, String>>{}.obs;
+  final RxList<String> languages = <String>[].obs; // Lista reativa de idiomas
 
-  static List<String> languages = [];
+  final SettingRepository _settingsRepo = SettingRepository();
+  final GetStorage _box = GetStorage();
 
-  SettingRepository _settingsRepo;
-  GetStorage _box;
-
-  TranslationService() {
-    _settingsRepo = new SettingRepository();
-    _box = new GetStorage();
-  }
-
-  // initialize the translation service by loading the assets/locales folder
-  // the assets/locales folder must contains file for each language that named
-  // with the code of language concatenate with the country code
-  // for example (en_US.json)
+  // Inicializa o serviço de tradução carregando arquivos de idioma
   Future<TranslationService> init() async {
-    languages = await _settingsRepo.getSupportedLocales();
+    languages.assignAll(await _settingsRepo.getSupportedLocales());
     await loadTranslation();
     return this;
   }
 
-  Future<void> loadTranslation({locale}) async {
-    locale = locale ?? getLocale().toString();
+  Future<void> loadTranslation({String? locale}) async {
+    locale ??= getLocale().toString();
     Map<String, String> _translations = await _settingsRepo.getTranslations(locale);
     Get.addTranslations({locale: _translations});
     Get.find<LaravelApiClient>().setLocale(locale);
   }
 
   Locale getLocale() {
-    String _locale = _box.read<String>('language');
-    if (_locale == null || _locale.isEmpty) {
-      _locale = Get.find<SettingsService>().setting.value.mobileLanguage;
+    String _locale = _box.read<String>('language') ?? ''; // Evita erro de null
+    if (_locale.isEmpty) {
+      _locale = Get.find<SettingsService>().setting.value.mobileLanguage ?? 'en_US';
     }
     return fromStringToLocale(_locale);
   }
 
-  // get list of supported local in the application
+  // Retorna a lista de idiomas suportados
   List<Locale> supportedLocales() {
-    return TranslationService.languages.map((_locale) {
-      return fromStringToLocale(_locale);
-    }).toList();
+    return languages.map((String _locale) => fromStringToLocale(_locale)).toList();
   }
 
-  // Convert string code to local object
+  // Converte string de código de idioma para Locale
   Locale fromStringToLocale(String _locale) {
     if (_locale.contains('_')) {
-      // en_US
-      return Locale(_locale.split('_').elementAt(0), _locale.split('_').elementAt(1));
+      var parts = _locale.split('_');
+      return Locale(parts[0], parts[1]);
     } else {
-      // en
       return Locale(_locale);
     }
   }

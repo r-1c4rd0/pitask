@@ -5,11 +5,8 @@ import 'package:get/get.dart';
 import '../providers/laravel_provider.dart';
 
 class UploadRepository {
-  LaravelApiClient _laravelApiClient;
+  final LaravelApiClient _laravelApiClient = Get.find<LaravelApiClient>();
 
-  UploadRepository() {
-    this._laravelApiClient = Get.find<LaravelApiClient>();
-  }
 
   Future<String> image(File image, String field) {
     return _laravelApiClient.uploadImage(image, field);

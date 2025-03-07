@@ -14,135 +14,127 @@ import '../models/user_model.dart';
 import '../providers/laravel_provider.dart';
 
 class EProviderRepository {
-  LaravelApiClient _laravelApiClient;
+  final LaravelApiClient _laravelApiClient = Get.find<LaravelApiClient>();
 
-  EProviderRepository() {
-    this._laravelApiClient = Get.find<LaravelApiClient>();
+  Future<EProvider> get(String eProviderId) async {
+    return await _laravelApiClient.getEProvider(eProviderId);
   }
 
-  Future<EProvider> get(String eProviderId) {
-    return _laravelApiClient.getEProvider(eProviderId);
+  Future<List<EProvider>> getAll() async {
+    return await _laravelApiClient.getEProviders();
   }
 
-  Future<List<EProvider>> getAll() {
-    return _laravelApiClient.getEProviders(null);
+  Future<List<Review>> getReviews(String userId) async {
+    return await _laravelApiClient.getEProviderReviews(userId);
   }
 
-  Future<List<Review>> getReviews(String userId) {
-    return _laravelApiClient.getEProviderReviews(userId);
+  Future<Review> getReview(String reviewId) async {
+    return await _laravelApiClient.getEProviderReview(reviewId);
   }
 
-  Future<Review> getReview(String reviewId) {
-    return _laravelApiClient.getEProviderReview(reviewId);
+  Future<List<Gallery>> getGalleries(String eProviderId) async {
+    return await _laravelApiClient.getEProviderGalleries(eProviderId);
   }
 
-  Future<List<Gallery>> getGalleries(String eProviderId) {
-    return _laravelApiClient.getEProviderGalleries(eProviderId);
+  Future<List<Award>> getAwards(String eProviderId) async {
+    return await _laravelApiClient.getEProviderAwards(eProviderId);
   }
 
-  Future<List<Award>> getAwards(String eProviderId) {
-    return _laravelApiClient.getEProviderAwards(eProviderId);
+  Future<List<Experience>> getExperiences(String eProviderId) async {
+    return await _laravelApiClient.getEProviderExperiences(eProviderId);
   }
 
-  Future<List<Experience>> getExperiences(String eProviderId) {
-    return _laravelApiClient.getEProviderExperiences(eProviderId);
+  Future<List<EService>> getEServices({String? eProviderId, int page = 1}) async {
+    return await _laravelApiClient.getEProviderEServices(eProviderId!, page);
   }
 
-  Future<List<EService>> getEServices({String eProviderId, int page}) {
-    return _laravelApiClient.getEProviderEServices(eProviderId, page);
+  Future<List<User>> getAllEmployees() async {
+    return await _laravelApiClient.getAllEmployees();
   }
 
-  Future<List<User>> getAllEmployees() {
-    return _laravelApiClient.getAllEmployees();
+  Future<List<Tax>> getTaxes() async {
+    return await _laravelApiClient.getTaxes();
   }
 
-  Future<List<Tax>> getTaxes() {
-    return _laravelApiClient.getTaxes();
+  Future<List<User>> getEmployees(String eProviderId) async {
+    return await _laravelApiClient.getEProviderEmployees(eProviderId);
   }
 
-  Future<List<User>> getEmployees(String eProviderId) {
-    return _laravelApiClient.getEProviderEmployees(eProviderId);
+  Future<List<EService>> getPopularEServices({String? eProviderId, int page = 1}) async {
+    return await _laravelApiClient.getEProviderPopularEServices(eProviderId!, page);
   }
 
-  Future<List<EService>> getPopularEServices({String eProviderId, int page}) {
-    return _laravelApiClient.getEProviderPopularEServices(eProviderId, page);
+  Future<List<EService>> getMostRatedEServices({String? eProviderId, int page = 1}) async {
+    return await _laravelApiClient.getEProviderMostRatedEServices(eProviderId!, page);
   }
 
-  Future<List<EService>> getMostRatedEServices({String eProviderId, int page}) {
-    return _laravelApiClient.getEProviderMostRatedEServices(eProviderId, page);
+  Future<List<EService>> getAvailableEServices({String? eProviderId, int page = 1}) async {
+    return await _laravelApiClient.getEProviderAvailableEServices(eProviderId!, page);
   }
 
-  Future<List<EService>> getAvailableEServices({String eProviderId, int page}) {
-    return _laravelApiClient.getEProviderAvailableEServices(eProviderId, page);
+  Future<List<EService>> getFeaturedEServices({String? eProviderId, int page = 1}) async {
+    return await _laravelApiClient.getEProviderFeaturedEServices(eProviderId!, page);
   }
 
-  Future<List<EService>> getFeaturedEServices({String eProviderId, int page}) {
-    return _laravelApiClient.getEProviderFeaturedEServices(eProviderId, page);
+  Future<List<EProvider>> getEProviders({int page = 1}) async {
+    return await _laravelApiClient.getEProviders(page);
   }
 
-  Future<List<EProvider>> getEProviders({int page}) {
-    return _laravelApiClient.getEProviders(page);
+  Future<List<EProviderType>> getEProviderTypes() async {
+    return await _laravelApiClient.getEProviderTypes();
   }
 
-  Future<List<EProviderType>> getEProviderTypes() {
-    return _laravelApiClient.getEProviderTypes();
+  /// Obtém os endereços do usuário
+  Future<List<Address>> getAddresses() async {
+    return await _laravelApiClient.getAddresses();
   }
 
-  /**
-   * Get the User's address
-   */
-  Future<List<Address>> getAddresses() {
-    return _laravelApiClient.getAddresses();
+  /// Cria um novo endereço para o usuário
+  Future<Address> createAddress(Address address) async {
+    return await _laravelApiClient.createAddress(address);
   }
 
-  /**
-   * Create a User's address
-   */
-  Future<Address> createAddress(Address address) {
-    return _laravelApiClient.createAddress(address);
+  Future<Address> updateAddress(Address address) async {
+    return await _laravelApiClient.updateAddress(address);
   }
 
-  Future<Address> updateAddress(Address address) {
-    return _laravelApiClient.updateAddress(address);
+  Future<void> deleteAddress(Address address) async {
+    await _laravelApiClient.deleteAddress(address);
   }
 
-  Future<Address> deleteAddress(Address address) {
-    return _laravelApiClient.deleteAddress(address);
+  Future<List<AvailabilityHour>> getAvailabilityHours(EProvider eProvider) async {
+    return await _laravelApiClient.getAvailabilityHours(eProvider);
   }
 
-  Future<List<AvailabilityHour>> getAvailabilityHours(EProvider eProvider) {
-    return _laravelApiClient.getAvailabilityHours(eProvider);
+  Future<AvailabilityHour> createAvailabilityHour(AvailabilityHour availabilityHour) async {
+    return await _laravelApiClient.createAvailabilityHour(availabilityHour);
   }
 
-  Future<AvailabilityHour> createAvailabilityHour(AvailabilityHour availabilityHour) {
-    return _laravelApiClient.createAvailabilityHour(availabilityHour);
+  Future<void> deleteAvailabilityHour(AvailabilityHour availabilityHour) async {
+    await _laravelApiClient.deleteAvailabilityHour(availabilityHour);
   }
 
-  Future<AvailabilityHour> deleteAvailabilityHour(AvailabilityHour availabilityHour) {
-    return _laravelApiClient.deleteAvailabilityHour(availabilityHour);
+  Future<List<EProvider>> getAcceptedEProviders({int page = 1}) async {
+    return await _laravelApiClient.getAcceptedEProviders(page);
   }
 
-  Future<List<EProvider>> getAcceptedEProviders({int page}) {
-    return _laravelApiClient.getAcceptedEProviders(page);
+  Future<List<EProvider>> getFeaturedEProviders({int page = 1}) async {
+    return await _laravelApiClient.getFeaturedEProviders(page);
   }
 
-  Future<List<EProvider>> getFeaturedEProviders({int page}) {
-    return _laravelApiClient.getFeaturedEProviders(page);
+  Future<List<EProvider>> getPendingEProviders({int page = 1}) async {
+    return await _laravelApiClient.getPendingEProviders(page);
   }
 
-  Future<List<EProvider>> getPendingEProviders({int page}) {
-    return _laravelApiClient.getPendingEProviders(page);
+  Future<EProvider> create(EProvider eProvider) async {
+    return await _laravelApiClient.createEProvider(eProvider);
   }
 
-  Future<EProvider> create(EProvider eProvider) {
-    return _laravelApiClient.createEProvider(eProvider);
+  Future<EProvider> update(EProvider eProvider) async {
+    return await _laravelApiClient.updateEProvider(eProvider);
   }
 
-  Future<EProvider> update(EProvider eProvider) {
-    return _laravelApiClient.updateEProvider(eProvider);
-  }
-
-  Future<EProvider> delete(EProvider eProvider) {
-    return _laravelApiClient.deleteEProvider(eProvider);
+  Future<void> delete(EProvider eProvider) async {
+    await _laravelApiClient.deleteEProvider(eProvider);
   }
 }

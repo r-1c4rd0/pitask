@@ -47,9 +47,9 @@ class FirebaseProvider extends GetxService {
   Future<void> sendCodeToPhone() async {
     Get.find<AuthService>().user.value.verificationId = '';
     final fba.PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verId) {};
-    final fba.PhoneCodeSent smsCodeSent = (String verId, [int forceCodeResent]) {
+    final fba.PhoneCodeSent smsCodeSent = (String verId, [int? forceCodeResent]) {
       Get.find<AuthService>().user.value.verificationId = verId;
-    };
+    } as fba.PhoneCodeSent;
     final fba.PhoneVerificationCompleted _verifiedSuccess = (fba.AuthCredential auth) async {};
     final fba.PhoneVerificationFailed _verifyFailed = (fba.FirebaseAuthException e) {
       throw Exception(e.message);

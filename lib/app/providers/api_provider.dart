@@ -7,7 +7,7 @@ import '../services/global_service.dart';
 mixin ApiClient {
   final globalService = Get.find<GlobalService>();
   final authService = Get.find<AuthService>();
-  String baseUrl;
+  late String baseUrl;
 
   String getBaseUrl(String path) {
     if (!path.endsWith('/')) {

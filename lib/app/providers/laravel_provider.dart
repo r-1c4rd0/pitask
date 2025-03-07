@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
-import 'package:dio_http_cache/dio_http_cache.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:get/get.dart';
 
 import '../../common/uuid.dart';
+import '../exceptions/network_exceptions.dart';
 import '../models/address_model.dart';
 import '../models/availability_hour_model.dart';
 import '../models/award_model.dart';
@@ -40,13 +41,13 @@ import 'api_provider.dart';
 import 'dio_client.dart';
 
 class LaravelApiClient extends GetxService with ApiClient {
-  DioClient _httpClient;
-  dio.Options _optionsNetwork;
-  dio.Options _optionsCache;
+  late final DioClient _httpClient;
+  late dio.Options _optionsNetwork;
+  late dio.Options _optionsCache;
 
   LaravelApiClient() {
-    this.baseUrl = this.globalService.global.value.laravelBaseUrl;
-    _httpClient = DioClient(this.baseUrl, new dio.Dio());
+    baseUrl = globalService.global.value.laravelBaseUrl;
+    _httpClient = DioClient(baseUrl, dio.Dio(), interceptors: []);
   }
 
   Future<LaravelApiClient> init() async {
@@ -55,13 +56,13 @@ class LaravelApiClient extends GetxService with ApiClient {
     return this;
   }
 
-  bool isLoading({String task, List<String> tasks}) {
+  bool isLoading({ String? task,  List<String>? tasks}) {
     return _httpClient.isLoading(task: task, tasks: tasks);
   }
 
   void setLocale(String locale) {
-    _optionsNetwork.headers['Accept-Language'] = locale;
-    _optionsCache.headers['Accept-Language'] = locale;
+    _optionsNetwork.headers?['Accept-Language'] = locale;
+    _optionsCache.headers?['Accept-Language'] = locale;
   }
 
   void forceRefresh() {
@@ -80,10 +81,20 @@ class LaravelApiClient extends GetxService with ApiClient {
 
   void unForceRefresh() {
     if (!foundation.kIsWeb && !foundation.kDebugMode) {
-      _optionsNetwork = buildCacheOptions(Duration(days: 3), forceRefresh: true, options: _optionsNetwork);
-      _optionsCache = buildCacheOptions(Duration(minutes: 10), forceRefresh: false, options: _optionsCache);
+      _optionsNetwork = CacheOptions(
+        store: MemCacheStore(),
+        policy: CachePolicy.refreshForceCache,
+        maxStale: const Duration(days: 3),
+      ).toOptions();
+
+      _optionsCache = CacheOptions(
+        store: MemCacheStore(),
+        policy: CachePolicy.forceCache,
+        maxStale: const Duration(minutes: 10),
+      ).toOptions();
     }
   }
+
 
   Future<User> getUser(User user) async {
     var _queryParameters = {
@@ -321,23 +332,53 @@ class LaravelApiClient extends GetxService with ApiClient {
   }
 
   Future<EService> updateEService(EService eService) async {
-    if (!authService.isAuth || !eService.hasData) {
-      throw new Exception("You don't have the permission to access to this area!".tr + "[ updateEService(EService eService) ]");
+    if (!authService.isAuth || eService == null || !eService.hasData) {
+      throw Exception("You don't have the permission to access to this area!".tr + "[ updateEService(EService eService) ]");
     }
     var _queryParameters = {
       'api_token': authService.apiToken,
     };
     Uri _uri = getApiBaseUri("e_services/${eService.id}").replace(queryParameters: _queryParameters);
 
-    var response = await _httpClient.patchUri(
-      _uri,
-      data: json.encode(eService.toJson()),
-      options: _optionsNetwork,
-    );
-    if (response.data['success'] == true) {
-      return EService.fromJson(response.data['data']);
-    } else {
-      throw new Exception(response.data['message']);
+    try {
+      var response = await _httpClient.patchUri(
+        _uri,
+        data: json.encode(eService.toJson()),
+        options: _httpClient.optionsNetwork,
+      );
+      if (response.data['success'] == true) {
+        return EService.fromJson(response.data['data']);
+      } else {
+        throw Exception(response.data['message']);
+      }
+    } catch (e) {
+      throw NetworkExceptions.getDioException(e);
+    }
+  }
+
+  Future<Option> updateOption(Option option) async {
+    if (!authService.isAuth || option == null || !option.hasData) {
+      throw Exception("You don't have the permission to access to this area!".tr + "[ updateOption(Option option) ]");
+    }
+    var _queryParameters = {
+      'api_token': authService.apiToken,
+    };
+    Uri _uri = getApiBaseUri("options/${option.id}").replace(queryParameters: _queryParameters);
+
+    print(option.toJson());
+    try {
+      var response = await _httpClient.patchUri(
+        _uri,
+        data: json.encode(option.toJson()),
+        options: _httpClient.optionsNetwork,
+      );
+      if (response.data['success'] == true) {
+        return Option.fromJson(response.data['data']);
+      } else {
+        throw Exception(response.data['message']);
+      }
+    } catch (e) {
+      throw NetworkExceptions.getDioException(e);
     }
   }
 
@@ -380,27 +421,6 @@ class LaravelApiClient extends GetxService with ApiClient {
     }
   }
 
-  Future<Option> updateOption(Option option) async {
-    if (!authService.isAuth || !option.hasData) {
-      throw new Exception("You don't have the permission to access to this area!".tr + "[ updateOption(Option option) ]");
-    }
-    var _queryParameters = {
-      'api_token': authService.apiToken,
-    };
-    Uri _uri = getApiBaseUri("options/${option.id}").replace(queryParameters: _queryParameters);
-
-    print(option.toJson());
-    var response = await _httpClient.patchUri(
-      _uri,
-      data: json.encode(option.toJson()),
-      options: _optionsNetwork,
-    );
-    if (response.data['success'] == true) {
-      return Option.fromJson(response.data['data']);
-    } else {
-      throw new Exception(response.data['message']);
-    }
-  }
 
   Future<bool> deleteOption(String optionId) async {
     if (!authService.isAuth || optionId == null) {
@@ -525,29 +545,30 @@ class LaravelApiClient extends GetxService with ApiClient {
     }
   }
 
-  Future<List<EProvider>> getEProviders(int page) async {
+  Future<List<EProvider>> getEProviders([int page = 1]) async {
     var _queryParameters = {
       'only': 'id;name',
       'orderBy': 'created_at',
       'sortedBy': 'desc',
       'api_token': authService.apiToken,
     };
-    if (page != null) {
-      _queryParameters['only'] = 'id;name;description;eProviderType;eProviderType.name;media';
-      _queryParameters['with'] = 'eProviderType;media';
 
-      _queryParameters['limit'] = '4';
-      _queryParameters['offset'] = ((page - 1) * 4).toString();
-    }
+    // Agora page nunca será null, pois tem um valor padrão (1)
+    _queryParameters['only'] = 'id;name;description;eProviderType;eProviderType.name;media';
+    _queryParameters['with'] = 'eProviderType;media';
+    _queryParameters['limit'] = '4';
+    _queryParameters['offset'] = ((page - 1) * 4).toString();
+
     Uri _uri = getApiBaseUri("provider/e_providers").replace(queryParameters: _queryParameters);
 
     var response = await _httpClient.getUri(_uri, options: _optionsCache);
     if (response.data['success'] == true) {
       return response.data['data'].map<EProvider>((obj) => EProvider.fromJson(obj)).toList();
     } else {
-      throw new Exception(response.data['message']);
+      throw Exception(response.data['message']);
     }
   }
+
 
   Future<List<EProvider>> getAcceptedEProviders(int page) async {
     var _queryParameters = {
@@ -727,29 +748,37 @@ class LaravelApiClient extends GetxService with ApiClient {
     }
   }
 
-  Future<List<EService>> getEProviderFeaturedEServices(String eProviderId, int page) async {
-    var _queryParameters = {
+  Future<List<EService>> getEProviderFeaturedEServices(String? eProviderId, int? page) async {
+    final Map<String, String> _queryParameters = {
       'with': 'eProvider;eProvider.addresses;categories',
       'search': 'featured:1',
       'searchFields': 'featured:=',
       'limit': '4',
-      'offset': ((page - 1) * 4).toString(),
+      'offset': (((page ?? 1) - 1) * 4).toString(),
       'api_token': authService.apiToken,
     };
-    if (eProviderId != null) {
-      _queryParameters['search'] += ';e_provider_id:$eProviderId';
-      _queryParameters['searchFields'] += ';e_provider_id:=';
+
+    if (eProviderId?.isNotEmpty ?? false) {
+      _queryParameters['search'] = '${_queryParameters['search']};e_provider_id:$eProviderId';
+      _queryParameters['searchFields'] = '${_queryParameters['searchFields']};e_provider_id:=';
       _queryParameters['searchJoin'] = 'and';
     }
+
     Uri _uri = getApiBaseUri("provider/e_services").replace(queryParameters: _queryParameters);
 
-    var response = await _httpClient.getUri(_uri, options: _optionsCache);
-    if (response.data['success'] == true) {
-      return response.data['data'].map<EService>((obj) => EService.fromJson(obj)).toList();
-    } else {
-      throw new Exception(response.data['message']);
+    try {
+      var response = await _httpClient.getUri(_uri, options: _optionsCache);
+      if (response.data['success'] == true) {
+        return (response.data['data'] as List).map<EService>((obj) => EService.fromJson(obj)).toList();
+      } else {
+        throw Exception(response.data['message']);
+      }
+    } catch (e) {
+      throw Exception("Erro ao buscar serviços: ${e.toString()}");
     }
   }
+
+
 
   Future<List<EService>> getEProviderPopularEServices(String eProviderId, int page) async {
     // TODO popular eServices

@@ -12,6 +12,7 @@ import '../../../services/firebase_messaging_service.dart';
 import '../../../services/settings_service.dart';
 
 class AuthController extends GetxController {
+  AuthController
   final Rx<User> currentUser = Get.find<AuthService>().user;
   GlobalKey<FormState> loginFormKey;
   GlobalKey<FormState> registerFormKey;
@@ -26,9 +27,9 @@ class AuthController extends GetxController {
   }
 
   void login() async {
-    Get.focusScope.unfocus();
-    if (loginFormKey.currentState.validate()) {
-      loginFormKey.currentState.save();
+    Get.focusScope?.unfocus();
+    if (loginFormKey.currentState!.validate()) {
+      loginFormKey.currentState?.save();
       loading.value = true;
       try {
         await Get.find<FireBaseMessagingService>().setDeviceToken();
@@ -37,7 +38,7 @@ class AuthController extends GetxController {
         loading.value = false;
         await Get.toNamed(Routes.ROOT, arguments: 0);
       } catch (e) {
-        Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+       // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
       } finally {
         loading.value = false;
       }
@@ -45,9 +46,9 @@ class AuthController extends GetxController {
   }
 
   void register() async {
-    Get.focusScope.unfocus();
-    if (registerFormKey.currentState.validate()) {
-      registerFormKey.currentState.save();
+    Get.focusScope?.unfocus();
+    if (registerFormKey.currentState!.validate()) {
+      registerFormKey.currentState?.save();
       loading.value = true;
       try {
         if (Get.find<SettingsService>().setting.value.enableOtp) {
@@ -81,7 +82,7 @@ class AuthController extends GetxController {
     } catch (e) {
       loading.value = false;
       Get.toNamed(Routes.REGISTER);
-      Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+      //Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     } finally {
       loading.value = false;
     }
@@ -92,9 +93,9 @@ class AuthController extends GetxController {
   }
 
   void sendResetLink() async {
-    Get.focusScope.unfocus();
-    if (forgotPasswordFormKey.currentState.validate()) {
-      forgotPasswordFormKey.currentState.save();
+    Get.focusScope?.unfocus();
+    if (forgotPasswordFormKey.currentState!.validate()) {
+      forgotPasswordFormKey.currentState?.save();
       loading.value = true;
       try {
         await _userRepository.sendResetLinkEmail(currentUser.value);
@@ -104,7 +105,7 @@ class AuthController extends GetxController {
           Get.offAndToNamed(Routes.LOGIN);
         });
       } catch (e) {
-        Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+       // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
       } finally {
         loading.value = false;
       }

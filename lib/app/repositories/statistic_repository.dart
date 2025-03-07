@@ -4,13 +4,11 @@ import '../models/statistic.dart';
 import '../providers/laravel_provider.dart';
 
 class StatisticRepository {
-  LaravelApiClient _laravelApiClient;
+ final LaravelApiClient _laravelApiClient  = Get.find<LaravelApiClient>();
 
-  StatisticRepository() {
-    _laravelApiClient = Get.find<LaravelApiClient>();
-  }
 
-  Future<List<Statistic>> getHomeStatistics() {
-    return _laravelApiClient.getHomeStatistics();
+
+  Future<List<Statistic>> getHomeStatistics() async {
+    return await _laravelApiClient.getHomeStatistics();
   }
 }

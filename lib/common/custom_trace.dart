@@ -1,78 +1,70 @@
 class CustomTrace {
   final StackTrace _trace;
+  late String fileName;
+  late String functionName;
+  late String callerFunctionName;
+  final String message;
+  late int lineNumber;
+  late int columnNumber;
 
-  String fileName;
-  String functionName;
-  String callerFunctionName;
-  String message;
-  int lineNumber;
-  int columnNumber;
-
-  CustomTrace(this._trace, {this.message}) {
+  CustomTrace(this._trace, {required this.message}) {
     _parseTrace();
   }
 
   String _getFunctionNameFromFrame(String frame) {
-    /* Just giving another nickname to the frame */
-    var currentTrace = frame;
+    try {
+      var currentTrace = frame;
+      var indexOfWhiteSpace = currentTrace.indexOf(' ');
+      if (indexOfWhiteSpace == -1) return "UnknownFunction";
 
-    /* To get rid off the #number thing, get the index of the first whitespace */
-    var indexOfWhiteSpace = currentTrace.indexOf(' ');
+      var subStr = currentTrace.substring(indexOfWhiteSpace).trim();
+      var indexOfFunction = subStr.indexOf(RegExp(r'[A-Za-z0-9]'));
 
-    /* Create a substring from the first whitespace index till the end of the string */
-    var subStr = currentTrace.substring(indexOfWhiteSpace);
+      if (indexOfFunction == -1) return "UnknownFunction";
+      subStr = subStr.substring(indexOfFunction);
 
-    /* Grab the function name using reg expr */
-    var indexOfFunction = subStr.indexOf(RegExp(r'[A-Za-z0-9]'));
+      indexOfWhiteSpace = subStr.indexOf(' ');
+      if (indexOfWhiteSpace == -1) return subStr;
 
-    /* Create a new substring from the function name index till the end of string */
-    subStr = subStr.substring(indexOfFunction);
-
-    indexOfWhiteSpace = subStr.indexOf(' ');
-
-    /* Create a new substring from start to the first index of a whitespace. This substring gives us the function name */
-    subStr = subStr.substring(0, indexOfWhiteSpace);
-
-    return subStr;
+      return subStr.substring(0, indexOfWhiteSpace);
+    } catch (e) {
+      return "UnknownFunction";
+    }
   }
 
   void _parseTrace() {
-    /* The trace comes with multiple lines of strings, (each line is also known as a frame), so split the trace's string by lines to get all the frames */
-    var frames = this._trace.toString().split("\n");
-
-    /* The first frame is the current function */
-    this.functionName = _getFunctionNameFromFrame(frames[0]);
-
-    /* The second frame is the caller function */
-    this.callerFunctionName = _getFunctionNameFromFrame(frames[1]);
-
-    /* The first frame has all the information we need */
-    var traceString = frames[0];
-
-    /* Search through the string and find the index of the file name by looking for the '.dart' regex */
-    var indexOfFileName = traceString.indexOf(RegExp(r'[A-Za-z]+.dart'));
-
-    var fileInfo = traceString.substring(indexOfFileName);
-
-    var listOfInfos = fileInfo.split(":");
-
-    /* Splitting fileInfo by the character ":" separates the file name, the line number and the column counter nicely.
-      Example: main.dart:5:12
-      To get the file name, we split with ":" and get the first index
-      To get the line number, we would have to get the second index
-      To get the column number, we would have to get the third index
-    */
     try {
-      this.fileName = listOfInfos[0];
-      this.lineNumber = int.tryParse(listOfInfos[1]);
-      var columnStr = listOfInfos[2];
-      columnStr = columnStr.replaceFirst(")", "");
-      this.columnNumber = int.tryParse(columnStr);
-    } catch (e) {}
+      var frames = _trace.toString().split("\n");
+
+      functionName = frames.isNotEmpty ? _getFunctionNameFromFrame(frames[0]) : "UnknownFunction";
+      callerFunctionName = frames.length > 1 ? _getFunctionNameFromFrame(frames[1]) : "UnknownCaller";
+
+      var traceString = frames.isNotEmpty ? frames[0] : "UnknownTrace";
+      var indexOfFileName = traceString.indexOf(RegExp(r'[A-Za-z_]+.dart'));
+
+      if (indexOfFileName != -1) {
+        var fileInfo = traceString.substring(indexOfFileName);
+        var listOfInfos = fileInfo.split(":");
+
+        fileName = listOfInfos.isNotEmpty ? listOfInfos[0] : "UnknownFile";
+        lineNumber = listOfInfos.length > 1 ? int.tryParse(listOfInfos[1]) ?? 0 : 0;
+        columnNumber = listOfInfos.length > 2 ? int.tryParse(listOfInfos[2].replaceAll(")", "")) ?? 0 : 0;
+      } else {
+        fileName = "UnknownFile";
+        lineNumber = 0;
+        columnNumber = 0;
+      }
+    } catch (e) {
+      fileName = "UnknownFile";
+      functionName = "UnknownFunction";
+      callerFunctionName = "UnknownCaller";
+      lineNumber = 0;
+      columnNumber = 0;
+    }
   }
 
   @override
   String toString() {
-    return "$message | ($functionName)";
+    return "$message | File: $fileName | Line: $lineNumber | Function: $functionName";
   }
 }

@@ -1,358 +1,170 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 
 import '../../common/custom_trace.dart';
 import '../exceptions/network_exceptions.dart';
 
-const _defaultConnectTimeout = Duration.millisecondsPerMinute;
-const _defaultReceiveTimeout = Duration.millisecondsPerMinute;
+const Duration _defaultConnectTimeout = Duration(minutes: 1);
+const Duration _defaultReceiveTimeout = Duration(minutes: 1);
 
 class DioClient {
   final String baseUrl;
-
-  Dio _dio;
-  Options optionsNetwork;
-  Options optionsCache;
+  late final Dio _dio;
+  late final CacheOptions cacheOptions;
+  late final Options _optionsNetwork;
+  late final Options _optionsCache;
   final List<Interceptor> interceptors;
-  final _progress = <String>[].obs;
+  final RxList<String> _progress = <String>[].obs;
+
+  /// 🔹 Expor `optionsNetwork` e `optionsCache`
+  Options get optionsNetwork => _optionsNetwork;
+  Options get optionsCache => _optionsCache;
 
   DioClient(
-    this.baseUrl,
-    Dio dio, {
-    this.interceptors,
-  }) {
-    _dio = dio ?? Dio();
-    _dio
-      ..options.baseUrl = baseUrl
-      ..options.connectTimeout = _defaultConnectTimeout
-      ..options.receiveTimeout = _defaultReceiveTimeout
-      ..httpClientAdapter
-      ..options.headers = {'Content-Type': 'application/json; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest', 'Accept-Language': 'en'};
-    if (interceptors?.isNotEmpty ?? false) {
-      _dio.interceptors.addAll(interceptors);
-    }
+      this.baseUrl,
+      Dio dio, {
+        required this.interceptors,
+      }) {
+    _dio = dio;
+    _dio.options = BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: _defaultConnectTimeout,
+      receiveTimeout: _defaultReceiveTimeout,
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept-Language': 'en',
+      },
+    );
+
+    // 🔹 Configuração do Cache usando CacheOptions
+    cacheOptions = CacheOptions(
+      store: HiveCacheStore('./cache/'),
+      policy: CachePolicy.request,
+      hitCacheOnErrorExcept: [401, 403],
+      maxStale: const Duration(days: 7),
+      priority: CachePriority.high,
+    );
+
+    // 🔹 Definição das opções de cache e rede
+    _optionsNetwork = Options(headers: _dio.options.headers);
+    _optionsCache = cacheOptions.toOptions();
+
+    _dio.interceptors.add(DioCacheInterceptor(options: cacheOptions));
+    _dio.interceptors.addAll(interceptors);
+
     if (kDebugMode) {
-      _dio.interceptors.add(LogInterceptor(responseBody: true, error: true, requestHeader: false, responseHeader: false, request: false, requestBody: false));
-    }
-    optionsNetwork = Options(headers: _dio.options.headers);
-    optionsCache = Options(headers: _dio.options.headers);
-    if (!kIsWeb && !kDebugMode) {
-      optionsNetwork = buildCacheOptions(Duration(days: 3), forceRefresh: true, options: optionsNetwork);
-      optionsCache = buildCacheOptions(Duration(minutes: 10), forceRefresh: false, options: optionsCache);
-      _dio.interceptors.add(DioCacheManager(CacheConfig(baseUrl: baseUrl)).interceptor);
-    }
-  }
-
-  Future<dynamic> get(
-    String uri, {
-    Map<String, dynamic> queryParameters,
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    try {
-      var response = await _dio.get(
-        uri,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
+      _dio.interceptors.add(
+        LogInterceptor(
+          responseBody: true,
+          error: true,
+          requestBody: true,
+          requestHeader: false,
+          responseHeader: false,
+        ),
       );
-      return response;
-    } on SocketException catch (e) {
-      throw SocketException(e.toString());
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
     }
   }
 
-  Future<dynamic> getUri(
-    Uri uri, {
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    CustomTrace programInfo = CustomTrace(StackTrace.current);
+  // 🔹 Método GET otimizado
+  Future<Response<T>> get<T>(String uri, {Options? options}) async {
+    return _request(
+          () => _dio.get<T>(uri, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'GET $uri'),
+    );
+  }
+
+  // 🔹 Método GET URI otimizado
+  Future<Response<T>> getUri<T>(Uri uri, {Options? options}) async {
+    return _request(
+          () => _dio.getUri<T>(uri, options: options ?? _optionsCache),
+      CustomTrace(StackTrace.current, message: 'GET URI $uri'),
+    );
+  }
+
+  // 🔹 Método POST otimizado
+  Future<Response<T>> post<T>(String uri, {dynamic data, Options? options}) async {
+    return _request(
+          () => _dio.post<T>(uri, data: data, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'POST $uri'),
+    );
+  }
+
+  // 🔹 Método POST URI otimizado (RESTAURADO)
+  Future<Response<T>> postUri<T>(Uri uri, {dynamic data, Options? options}) async {
+    return _request(
+          () => _dio.postUri<T>(uri, data: data, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'POST URI $uri'),
+    );
+  }
+
+  // 🔹 Método PUT otimizado
+  Future<Response<T>> put<T>(String uri, {dynamic data, Options? options}) async {
+    return _request(
+          () => _dio.put<T>(uri, data: data, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'PUT $uri'),
+    );
+  }
+
+  // 🔹 Método PUT URI otimizado (RESTAURADO)
+  Future<Response<T>> putUri<T>(Uri uri, {dynamic data, Options? options}) async {
+    return _request(
+          () => _dio.putUri<T>(uri, data: data, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'PUT URI $uri'),
+    );
+  }
+
+  // 🔹 Método DELETE otimizado
+  Future<Response<T>> delete<T>(String uri, {dynamic data, Options? options}) async {
+    return _request(
+          () => _dio.delete<T>(uri, data: data, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'DELETE $uri'),
+    );
+  }
+
+  // 🔹 Método DELETE URI otimizado (RESTAURADO)
+
+  Future<Response<T>> deleteUri<T>(Uri uri, {dynamic data, Options? options}) async {
+    return _request(
+          () => _dio.deleteUri<T>(uri, data: data, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'DELETE URI $uri'),
+    );
+  }
+
+  Future<Response<T>> patchUri<T>(Uri uri, {dynamic data, Options? options}) async {
+    return _request(
+          () => _dio.patchUri<T>(uri, data: data, options: options ?? _optionsNetwork),
+      CustomTrace(StackTrace.current, message: 'PATCH URI $uri'),
+    );
+  }
+
+  // 🔹 Tratamento de execução com logging
+  Future<Response<T>> _request<T>(
+      Future<Response<T>> Function() request,
+      CustomTrace trace,
+      ) async {
     try {
-      _startProgress(programInfo);
-      var response = await _dio.getUri(
-        uri,
-        options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      );
-      _endProgress(programInfo);
+      _startProgress(trace);
+      final response = await request();
       return response;
-    } on SocketException catch (e) {
-      throw SocketException(e.toString());
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } on FlutterError catch (e) {
-      print(e.runtimeType);
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    } finally {
-      _endProgress(programInfo);
-    }
-  }
-
-  void _endProgress(CustomTrace programInfo) {
-    try {
-      _progress.remove(_getTaskName(programInfo));
-    } on FlutterError {}
-  }
-
-  void _startProgress(CustomTrace programInfo) {
-    try {
-      _progress.add(_getTaskName(programInfo));
-    } on FlutterError {}
-  }
-
-  Future<dynamic> post(
-    String uri, {
-    data,
-    Map<String, dynamic> queryParameters,
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onSendProgress,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    try {
-      var response = await _dio.post(
-        uri,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    }
-  }
-
-  Future<dynamic> postUri(
-    Uri uri, {
-    data,
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onSendProgress,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    CustomTrace programInfo = CustomTrace(StackTrace.current);
-    try {
-      _startProgress(programInfo);
-      var response = await _dio.postUri(
-        uri,
-        data: data,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-      _endProgress(programInfo);
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
+    } on SocketException {
+      throw Exception("No internet connection");
+    } on FormatException {
+      throw Exception("Unable to process the data");
     } catch (e) {
       throw NetworkExceptions.getDioException(e);
     } finally {
-      _endProgress(programInfo);
+      _endProgress(trace);
     }
   }
+  void _startProgress(CustomTrace trace) => _progress.add(trace.callerFunctionName);
 
-  Future<dynamic> put(
-    String uri, {
-    data,
-    Map<String, dynamic> queryParameters,
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onSendProgress,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    try {
-      var response = await _dio.put(
-        uri,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    }
-  }
+  void _endProgress(CustomTrace trace) => _progress.remove(trace.callerFunctionName);
 
-  Future<dynamic> putUri(
-    Uri uri, {
-    data,
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onSendProgress,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    CustomTrace programInfo = CustomTrace(StackTrace.current);
-    try {
-      _startProgress(programInfo);
-      var response = await _dio.putUri(
-        uri,
-        data: data,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-      _endProgress(programInfo);
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    } finally {
-      _endProgress(programInfo);
-    }
-  }
-
-  Future<dynamic> patch(
-    String uri, {
-    data,
-    Map<String, dynamic> queryParameters,
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onSendProgress,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    try {
-      var response = await _dio.patch(
-        uri,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    }
-  }
-
-  Future<dynamic> patchUri(
-    Uri uri, {
-    data,
-    Options options,
-    CancelToken cancelToken,
-    ProgressCallback onSendProgress,
-    ProgressCallback onReceiveProgress,
-  }) async {
-    CustomTrace programInfo = CustomTrace(StackTrace.current);
-    try {
-      _startProgress(programInfo);
-      var response = await _dio.patchUri(
-        uri,
-        data: data,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-      _endProgress(programInfo);
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    } finally {
-      _endProgress(programInfo);
-    }
-  }
-
-  Future<dynamic> delete(
-    String uri, {
-    data,
-    Map<String, dynamic> queryParameters,
-    Options options,
-    CancelToken cancelToken,
-  }) async {
-    try {
-      var response = await _dio.delete(
-        uri,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      );
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    }
-  }
-
-  Future<dynamic> deleteUri(
-    Uri uri, {
-    data,
-    Options options,
-    CancelToken cancelToken,
-  }) async {
-    CustomTrace programInfo = CustomTrace(StackTrace.current);
-    try {
-      _startProgress(programInfo);
-      var response = await _dio.deleteUri(
-        uri,
-        data: data,
-        options: options,
-        cancelToken: cancelToken,
-      );
-      _endProgress(programInfo);
-      return response;
-    } on FormatException catch (_) {
-      throw FormatException("Unable to process the data");
-    } catch (e) {
-      throw NetworkExceptions.getDioException(e);
-    } finally {
-      _endProgress(programInfo);
-    }
-  }
-
-  bool isLoading({String task, List<String> tasks}) {
-    //Get.log(_progress.toString());
-    if (tasks != null) {
-      return _progress.any((_task) => _progress.contains(_task));
-    }
-    return _progress.contains(task);
-  }
-
-  String _getTaskName(programInfo) {
-    return programInfo.callerFunctionName.split('.')[1];
-  }
+  bool isLoading( {String? task, List<String>? tasks}) => _progress.contains(task);
 }
-
-/*
-*     (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (HttpClient client) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-      return client;
-    };
-*
-* */
