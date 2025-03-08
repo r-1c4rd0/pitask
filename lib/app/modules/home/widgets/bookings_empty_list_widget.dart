@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 class BookingsEmptyListWidget extends StatelessWidget {
   const BookingsEmptyListWidget({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -64,7 +64,7 @@ class BookingsEmptyListWidget extends StatelessWidget {
             child: Text(
               "You don't have any booking inside this status".tr,
               textAlign: TextAlign.center,
-              style: Get.textTheme.headline4,
+              style: Get.textTheme.headlineMedium,
             ),
           ),
         ),

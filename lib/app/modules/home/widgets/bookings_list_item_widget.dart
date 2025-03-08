@@ -43,7 +43,7 @@ class BookingsListItemWidget extends StatelessWidget {
                     height: 80,
                     width: 80,
                     fit: BoxFit.cover,
-                    imageUrl: _booking.eService!.firstImageThumb,
+                    imageUrl: _booking.eService!.firstImageThumb!,
                     placeholder: (context, url) => Image.asset(
                       'assets/img/loading.gif',
                       fit: BoxFit.cover,

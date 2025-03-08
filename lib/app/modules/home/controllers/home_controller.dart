@@ -11,40 +11,42 @@ import '../../../services/global_service.dart';
 import '../../root/controllers/root_controller.dart';
 
 class HomeController extends GetxController {
-  StatisticRepository _statisticRepository;
-  BookingRepository _bookingsRepository;
+  late final StatisticRepository _statisticRepository;
+  late final BookingRepository _bookingsRepository;
 
-  final statistics = <Statistic>[].obs;
-  final bookings = <Booking>[].obs;
-  final bookingStatuses = <BookingStatus>[].obs;
-  final page = 0.obs;
-  final isLoading = true.obs;
-  final isDone = false.obs;
-  final currentStatus = '1'.obs;
+  final RxList<Statistic> statistics = <Statistic>[].obs;
+  final RxList<Booking> bookings = <Booking>[].obs;
+  final RxList<BookingStatus> bookingStatuses = <BookingStatus>[].obs;
+  final RxInt page = 0.obs;
+  final RxBool isLoading = true.obs;
+  final RxBool isDone = false.obs;
+  final RxString currentStatus = '1'.obs;
 
-  ScrollController scrollController;
+  late ScrollController scrollController;
 
   HomeController() {
-    _statisticRepository = new StatisticRepository();
-    _bookingsRepository = new BookingRepository();
+    _statisticRepository = StatisticRepository();
+    _bookingsRepository = BookingRepository();
   }
 
   @override
   Future<void> onInit() async {
+    initScrollController();
     await refreshHome();
     super.onInit();
   }
 
   @override
   void onClose() {
-    scrollController?.dispose();
+    scrollController.dispose();
+    super.onClose();
   }
 
-  Future refreshHome({bool showMessage = false, String statusId}) async {
+  Future<void> refreshHome({bool showMessage = false, String? statusId}) async {
     await getBookingStatuses();
     await getStatistics();
     Get.find<RootController>().getNotificationsCount();
-    changeTab(statusId);
+    changeTab(statusId ?? currentStatus.value);
     if (showMessage) {
       Get.showSnackbar(Ui.SuccessSnackBar(message: "Home page refreshed successfully".tr));
     }
@@ -60,13 +62,13 @@ class HomeController extends GetxController {
   }
 
   void changeTab(String statusId) async {
-    this.bookings.clear();
-    currentStatus.value = statusId ?? currentStatus.value;
+    bookings.clear();
+    currentStatus.value = statusId;
     page.value = 0;
     await loadBookingsOfStatus(statusId: currentStatus.value);
   }
 
-  Future getStatistics() async {
+  Future<void> getStatistics() async {
     try {
       statistics.assignAll(await _statisticRepository.getHomeStatistics());
     } catch (e) {
@@ -74,7 +76,7 @@ class HomeController extends GetxController {
     }
   }
 
-  Future getBookingStatuses() async {
+  Future<void> getBookingStatuses() async {
     try {
       bookingStatuses.assignAll(await _bookingsRepository.getStatuses());
     } catch (e) {
@@ -82,17 +84,23 @@ class HomeController extends GetxController {
     }
   }
 
-  BookingStatus getStatusByOrder(int order) => bookingStatuses.firstWhere((s) => s.order == order, orElse: () {
+  BookingStatus getStatusByOrder(int order) {
+    return bookingStatuses.firstWhere(
+          (s) => s.order == order,
+      orElse: () {
         Get.showSnackbar(Ui.ErrorSnackBar(message: "Booking status not found".tr));
         return BookingStatus();
-      });
+      },
+    );
+  }
 
-  Future loadBookingsOfStatus({String statusId}) async {
+  Future<void> loadBookingsOfStatus({required String statusId}) async {
     try {
       isLoading.value = true;
       isDone.value = false;
       page.value++;
       List<Booking> _bookings = [];
+
       if (bookingStatuses.isNotEmpty) {
         _bookings = await _bookingsRepository.all(statusId, page: page.value);
       }
@@ -111,7 +119,7 @@ class HomeController extends GetxController {
 
   Future<void> changeBookingStatus(Booking booking, BookingStatus bookingStatus) async {
     try {
-      final _booking = new Booking(id: booking.id, status: bookingStatus);
+      final Booking _booking = Booking(id: booking.id, status: bookingStatus);
       await _bookingsRepository.update(_booking);
       bookings.removeWhere((element) => element.id == booking.id);
     } catch (e) {
@@ -120,19 +128,22 @@ class HomeController extends GetxController {
   }
 
   Future<void> acceptBookingService(Booking booking) async {
-    final _status = Get.find<HomeController>().getStatusByOrder(Get.find<GlobalService>().global.value.accepted);
+    final int acceptedStatus = Get.find<GlobalService>().global.value.accepted ?? 0;
+    final BookingStatus _status = getStatusByOrder(acceptedStatus);
     await changeBookingStatus(booking, _status);
     Get.showSnackbar(Ui.SuccessSnackBar(title: "Status Changed".tr, message: "Booking has been accepted".tr));
   }
 
   Future<void> declineBookingService(Booking booking) async {
     try {
-      if (booking.status.order < Get.find<GlobalService>().global.value.onTheWay) {
-        final _status = getStatusByOrder(Get.find<GlobalService>().global.value.failed);
-        final _booking = new Booking(id: booking.id, cancel: true, status: _status);
+      final int onTheWay = Get.find<GlobalService>().global.value.onTheWay ?? 0;
+      if (booking.status!.order! < onTheWay) {
+        final int failedStatus = Get.find<GlobalService>().global.value.failed ?? 0;
+        final BookingStatus _status = getStatusByOrder(failedStatus);
+        final Booking _booking = Booking(id: booking.id, cancel: true, status: _status);
         await _bookingsRepository.update(_booking);
         bookings.removeWhere((element) => element.id == booking.id);
-        Get.showSnackbar(Ui.defaultSnackBar(title: "Status Changed".tr, message: "Booking has been declined".tr));
+        Get.showSnackbar(Ui.SuccessSnackBar(title: "Status Changed".tr, message: "Booking has been declined".tr));
       }
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));

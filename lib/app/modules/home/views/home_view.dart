@@ -36,8 +36,8 @@ class HomeView extends GetView<HomeController> {
                     floating: false,
                     iconTheme: IconThemeData(color: Get.theme.primaryColor),
                     title: Text(
-                      Get.find<SettingsService>().setting.value.providerAppName,
-                      style: Get.textTheme.headline6,
+                      Get.find<SettingsService>().setting.value.providerAppName ?? '',
+                      style: Get.textTheme.titleLarge,
                     ),
                     centerTitle: true,
                     automaticallyImplyLeading: false,
@@ -55,7 +55,7 @@ class HomeView extends GetView<HomeController> {
                               var _status = controller.bookingStatuses.elementAt(index);
                               return ChipWidget(
                                 tag: 'home',
-                                text: _status.status,
+                                text: _status.status!,
                                 id: _status.id,
                                 onSelected: (id) {
                                   controller.changeTab(id);
