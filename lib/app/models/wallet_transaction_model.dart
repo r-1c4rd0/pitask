@@ -6,12 +6,12 @@ import 'user_model.dart';
 enum TransactionActions { CREDIT, DEBIT }
 
 class WalletTransaction extends Model {
-  String id;
-  double amount;
-  String description;
-  TransactionActions action;
-  DateTime dateTime;
-  User user;
+  String? id;
+  double? amount;
+  String? description;
+  TransactionActions? action;
+  DateTime? dateTime;
+  User? user;
 
   WalletTransaction({this.id, this.amount, this.description, this.action, this.user});
 
@@ -20,7 +20,7 @@ class WalletTransaction extends Model {
     description = stringFromJson(json, 'description');
     amount = doubleFromJson(json, 'amount');
     user = objectFromJson(json, 'user', (value) => User.fromJson(value));
-    dateTime = dateFromJson(json, 'created_at', defaultValue: null);
+    dateTime = dateFromJson(json, 'created_at', defaultValue: DateTime.now());
     if (json != null) {
       if (json['action'] == 'credit') {
         action = TransactionActions.CREDIT;
@@ -43,6 +43,6 @@ class WalletTransaction extends Model {
 
   String getDescription() {
     description = description ?? "";
-    return description.substring(description.length - min(description.length, 20), description.length);
+    return description!.substring(description!.length - min(description!.length, 20), description!.length);
   }
 }

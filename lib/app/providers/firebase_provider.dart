@@ -34,8 +34,15 @@ class FirebaseProvider extends GetxService {
 
   Future<void> verifyPhone(String smsCode) async {
     try {
+      final String verificationId = Get.find<AuthService>().user.value.verificationId ?? '';
+
+      if (verificationId.isEmpty) {
+        throw Exception("Verification ID is missing. Please request a new verification code.");
+      }
+
       final fba.AuthCredential credential =
-          fba.PhoneAuthProvider.credential(verificationId: Get.find<AuthService>().user.value.verificationId, smsCode: smsCode);
+      fba.PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
+
       await fba.FirebaseAuth.instance.signInWithCredential(credential);
       Get.find<AuthService>().user.value.verifiedPhone = true;
     } catch (e) {
@@ -43,6 +50,7 @@ class FirebaseProvider extends GetxService {
       throw Exception(e.toString());
     }
   }
+
 
   Future<void> sendCodeToPhone() async {
     Get.find<AuthService>().user.value.verificationId = '';

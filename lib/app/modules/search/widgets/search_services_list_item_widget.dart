@@ -12,8 +12,8 @@ import '../../../routes/app_routes.dart';
 
 class SearchServicesListItemWidget extends StatelessWidget {
   const SearchServicesListItemWidget({
-    Key key,
-    @required EService service,
+    Key? key,
+    required EService service,
   })  : _service = service,
         super(key: key);
 
@@ -35,14 +35,14 @@ class SearchServicesListItemWidget extends StatelessWidget {
             Column(
               children: [
                 Hero(
-                  tag: 'search_list_item' + _service.id,
+                  tag: 'search_list_item' + _service.id!,
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                     child: CachedNetworkImage(
                       height: 80,
                       width: 80,
                       fit: BoxFit.cover,
-                      imageUrl: _service.firstImageUrl,
+                      imageUrl: _service.firstImageUrl!,
                       placeholder: (context, url) => Image.asset(
                         'assets/img/loading.gif',
                         fit: BoxFit.cover,
@@ -53,12 +53,12 @@ class SearchServicesListItemWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (_service.eProvider.available)
+                if (_service.eProvider!.available!)
                   Container(
                     width: 80,
                     child: Text("Available".tr,
                         maxLines: 1,
-                        style: Get.textTheme.bodyText2.merge(
+                        style: Get.textTheme.bodyMedium!.merge(
                           TextStyle(color: Colors.green, height: 1.4, fontSize: 10),
                         ),
                         softWrap: false,
@@ -70,12 +70,12 @@ class SearchServicesListItemWidget extends StatelessWidget {
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 5, vertical: 6),
                   ),
-                if (!_service.eProvider.available)
+                if (!_service.eProvider!.available!)
                   Container(
                     width: 80,
                     child: Text("Offline".tr,
                         maxLines: 1,
-                        style: Get.textTheme.bodyText2.merge(
+                        style: Get.textTheme.bodyMedium!.merge(
                           TextStyle(color: Colors.grey, height: 1.4, fontSize: 10),
                         ),
                         softWrap: false,
@@ -99,7 +99,7 @@ class SearchServicesListItemWidget extends StatelessWidget {
                     children: [
                       Text(
                         _service.name ?? '',
-                        style: Get.textTheme.bodyText2,
+                        style: Get.textTheme.bodyMedium,
                         maxLines: 3,
                         // textAlign: TextAlign.end,
                       ),
@@ -125,16 +125,16 @@ class SearchServicesListItemWidget extends StatelessWidget {
                                     color: Get.theme.colorScheme.secondary,
                                     size: 18,
                                   ),
-                                  Text(_service.rate.toString(), style: Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.colorScheme.secondary, height: 1.4))),
+                                  Text(_service.rate.toString(), style: Get.textTheme.bodyMedium!.merge(TextStyle(color: Get.theme.colorScheme.secondary, height: 1.4))),
                                 ],
                               ),
-                              backgroundColor: Get.theme.colorScheme.secondary.withOpacity(0.15),
+                              backgroundColor: Get.theme.colorScheme.secondary!.withOpacity(0.15),
                               shape: StadiumBorder(),
                             ),
                           ),
                           Text(
                             "From (%s)".trArgs([_service.totalReviews.toString()]),
-                            style: Get.textTheme.bodyText1,
+                            style: Get.textTheme.bodyLarge,
                           ),
                         ],
                       ),
@@ -144,12 +144,12 @@ class SearchServicesListItemWidget extends StatelessWidget {
                           if (_service.getOldPrice > 0)
                             Ui.getPrice(
                               _service.getOldPrice,
-                              style: Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.focusColor, decoration: TextDecoration.lineThrough)),
+                              style: Get.textTheme.bodyMedium!.merge(TextStyle(color: Get.theme.focusColor, decoration: TextDecoration.lineThrough)),
                               unit: _service.getUnit,
                             ),
                           Ui.getPrice(
                             _service.getPrice,
-                            style: Get.textTheme.headline6,
+                            style: Get.textTheme.titleLarge,
                             unit: _service.getUnit,
                           ),
                         ],
@@ -172,11 +172,11 @@ class SearchServicesListItemWidget extends StatelessWidget {
                       SizedBox(width: 5),
                       Flexible(
                         child: Text(
-                          _service.eProvider.name,
+                          _service.eProvider!.name ?? '',
                           maxLines: 1,
                           overflow: TextOverflow.fade,
                           softWrap: false,
-                          style: Get.textTheme.bodyText1,
+                          style: Get.textTheme.bodyLarge,
                         ),
                       ),
                     ],
@@ -192,11 +192,11 @@ class SearchServicesListItemWidget extends StatelessWidget {
                       Flexible(
                         child: Text(
                           // TODO eProvider address
-                          _service.eProvider.firstAddress,
+                          _service.eProvider!.firstAddress ?? '',
                           maxLines: 1,
                           overflow: TextOverflow.fade,
                           softWrap: false,
-                          style: Get.textTheme.bodyText1,
+                          style: Get.textTheme.bodyLarge,
                         ),
                       ),
                     ],
@@ -204,10 +204,10 @@ class SearchServicesListItemWidget extends StatelessWidget {
                   Divider(height: 8, thickness: 1),
                   Wrap(
                     spacing: 5,
-                    children: List.generate(_service.categories.length, (index) {
+                    children: List.generate(_service.categories!.length, (index) {
                       return Container(
                         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        child: Text(_service.categories.elementAt(index).name, style: Get.textTheme.caption.merge(TextStyle(fontSize: 10))),
+                        child: Text(_service.categories!.elementAt(index).name ?? "", style: Get.textTheme.bodySmall?.merge(TextStyle(fontSize: 10))),
                         decoration: BoxDecoration(
                             color: Get.theme.primaryColor,
                             border: Border.all(

@@ -34,7 +34,7 @@ class AuthController extends GetxController {
       try {
         await Get.find<FireBaseMessagingService>().setDeviceToken();
         currentUser.value = await _userRepository.login(currentUser.value);
-        await _userRepository.signInWithEmailAndPassword(currentUser.value.email, currentUser.value.apiToken);
+        await _userRepository.signInWithEmailAndPassword(currentUser.value.email ?? "", currentUser.value.apiToken ?? "");
         loading.value = false;
         await Get.toNamed(Routes.ROOT, arguments: 0);
       } catch (e) {
@@ -51,14 +51,14 @@ class AuthController extends GetxController {
       registerFormKey.currentState?.save();
       loading.value = true;
       try {
-        if (Get.find<SettingsService>().setting.value.enableOtp) {
+        if (Get.find<SettingsService>().setting.value.enableOtp = true ) {
           await _userRepository.sendCodeToPhone();
           loading.value = false;
           await Get.toNamed(Routes.PHONE_VERIFICATION);
         } else {
           await Get.find<FireBaseMessagingService>().setDeviceToken();
           currentUser.value = await _userRepository.register(currentUser.value);
-          await _userRepository.signUpWithEmailAndPassword(currentUser.value.email, currentUser.value.apiToken);
+          await _userRepository.signUpWithEmailAndPassword(currentUser.value.email  ?? "", currentUser.value.apiToken  ?? "");
           loading.value = false;
           await Get.offAllNamed(Routes.E_PROVIDERS);
         }
@@ -76,7 +76,7 @@ class AuthController extends GetxController {
       await _userRepository.verifyPhone(smsSent.value);
       await Get.find<FireBaseMessagingService>().setDeviceToken();
       currentUser.value = await _userRepository.register(currentUser.value);
-      await _userRepository.signUpWithEmailAndPassword(currentUser.value.email, currentUser.value.apiToken);
+      await _userRepository.signUpWithEmailAndPassword(currentUser.value.email  ?? "", currentUser.value.apiToken ?? "");
       loading.value = false;
       await Get.offAllNamed(Routes.E_PROVIDERS);
     } catch (e) {
@@ -100,7 +100,7 @@ class AuthController extends GetxController {
       try {
         await _userRepository.sendResetLinkEmail(currentUser.value);
         loading.value = false;
-        Get.showSnackbar(Ui.SuccessSnackBar(message: "The Password reset link has been sent to your email: ".tr + currentUser.value.email));
+        Get.showSnackbar(Ui.SuccessSnackBar(message: "The Password reset link has been sent to your email: ".tr + (currentUser.value.email  ?? "")));
         Timer(Duration(seconds: 5), () {
           Get.offAndToNamed(Routes.LOGIN);
         });

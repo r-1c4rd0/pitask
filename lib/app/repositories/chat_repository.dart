@@ -80,7 +80,7 @@ class ChatRepository {
   }
 
   Stream<List<Chat>> getChats(Message message) {
-    updateMessage(message.id, {'read_by_users': message.readByUsers});
+    updateMessage(message.id!, {'read_by_users': message.readByUsers});
     return _firestore
         .collection("messages")
         .doc(message.id)
@@ -95,7 +95,7 @@ class ChatRepository {
   Future<void> addMessage(Message message, Chat chat) async {
     try {
       await _firestore.collection("messages").doc(message.id).collection("chats").add(chat.toJson());
-      await updateMessage(message.id, {'last_message': chat.toJson()}); // Corrigido erro anterior
+      await updateMessage(message.id!, {'last_message': chat.toJson()}); // Corrigido erro anterior
     } catch (e) {
       print("Erro ao adicionar mensagem: $e");
     }

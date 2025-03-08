@@ -17,21 +17,18 @@ class ProfileController extends GetxController {
   final newPassword = "".obs;
   final confirmPassword = "".obs;
   final smsSent = "".obs;
-  GlobalKey<FormState> profileForm;
-  UserRepository _userRepository;
+  late GlobalKey<FormState> profileForm;
+  UserRepository _userRepository = UserRepository();
 
-  ProfileController() {
-    _userRepository = new UserRepository();
-  }
 
   @override
   void onInit() {
     user.value = Get.find<AuthService>().user.value;
-    avatar.value = new Media(thumb: user.value.avatar.thumb);
+    avatar.value = new Media(thumb: user.value.avatar!.thumb);
     super.onInit();
   }
 
-  Future refreshProfile({bool showMessage}) async {
+  Future refreshProfile({bool? showMessage}) async {
     await getUser();
     if (showMessage == true) {
       Get.showSnackbar(Ui.SuccessSnackBar(message: "List of faqs refreshed successfully".tr));
@@ -39,14 +36,14 @@ class ProfileController extends GetxController {
   }
 
   void saveProfileForm() async {
-    Get.focusScope.unfocus();
-    if (profileForm.currentState.validate()) {
+    Get.focusScope!.unfocus();
+    if (profileForm.currentState!.validate()) {
       try {
-        profileForm.currentState.save();
+        profileForm.currentState!.save();
         user.value.deviceToken = null;
         user.value.password = newPassword.value == confirmPassword.value ? newPassword.value : null;
-        user.value.avatar.id = avatar.value.id;
-        if (Get.find<SettingsService>().setting.value.enableOtp) {
+        user.value.avatar!.id = avatar.value.id;
+        if (Get.find<SettingsService>().setting.value.enableOtp == true) {
           await _userRepository.sendCodeToPhone();
           Get.bottomSheet(
             PhoneVerificationBottomSheetWidget(),
@@ -78,8 +75,8 @@ class ProfileController extends GetxController {
   }
 
   void resetProfileForm() {
-    avatar.value = new Media(thumb: user.value.avatar.thumb);
-    profileForm.currentState.reset();
+    avatar.value = new Media(thumb: user.value.avatar!.thumb);
+    profileForm.currentState!.reset();
   }
 
   Future getUser() async {

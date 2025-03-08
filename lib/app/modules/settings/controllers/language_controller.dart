@@ -7,11 +7,7 @@ import '../../../services/translation_service.dart';
 import 'theme_mode_controller.dart';
 
 class LanguageController extends GetxController {
-  GetStorage _box;
-
-  LanguageController() {
-    _box = new GetStorage();
-  }
+  GetStorage _box = GetStorage();
 
   void updateLocale(value) async {
     await Get.find<TranslationService>().loadTranslation(locale: value);

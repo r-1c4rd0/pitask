@@ -9,23 +9,24 @@ import 'search_services_list_item_widget.dart';
 class SearchServicesListWidget extends StatelessWidget {
   final List<EService> services;
 
-  SearchServicesListWidget({Key key, List<EService> this.services}) : super(key: key);
+  const SearchServicesListWidget({Key? key, required this.services}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (this.services.isEmpty) {
+      if (services.isEmpty) {
         return CircularLoadingWidget(height: 300);
       } else {
         return ListView.builder(
-          padding: EdgeInsets.only(bottom: 10, top: 10),
+          padding: const EdgeInsets.only(bottom: 10, top: 10),
           primary: false,
           shrinkWrap: true,
           itemCount: services.length,
-          itemBuilder: ((_, index) {
-            var _service = services.elementAt(index);
-            return SearchServicesListItemWidget(service: _service);
-          }),
+          // Erro 2: Uso incorreto de asteriscos (*) e função de callback
+          itemBuilder: (context, index) {
+            var service = services.elementAt(index);
+            return SearchServicesListItemWidget(service: service);
+          },
         );
       }
     });

@@ -9,10 +9,10 @@ class WalletsController extends GetxController {
   final wallets = <Wallet>[].obs;
   final walletTransactions = <WalletTransaction>[].obs;
   final selectedWallet = new Wallet().obs;
-  PaymentRepository _paymentRepository;
+  PaymentRepository _paymentRepository = PaymentRepository();
 
   WalletsController() {
-    _paymentRepository = new PaymentRepository();
+    _paymentRepository = PaymentRepository();
   }
 
   @override
@@ -21,7 +21,7 @@ class WalletsController extends GetxController {
     super.onInit();
   }
 
-  Future refreshWallets({bool showMessage}) async {
+  Future refreshWallets({bool? showMessage}) async {
     await getWallets();
     initSelectedWallet();
     await getWalletTransactions();
@@ -34,7 +34,7 @@ class WalletsController extends GetxController {
     try {
       wallets.assignAll(await _paymentRepository.getWallets());
     } catch (e) {
-      Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+      //Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
   }
 
@@ -42,7 +42,7 @@ class WalletsController extends GetxController {
     try {
       walletTransactions.assignAll(await _paymentRepository.getWalletTransactions(selectedWallet.value));
     } catch (e) {
-      Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+     // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
   }
 

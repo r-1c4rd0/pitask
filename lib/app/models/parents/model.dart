@@ -7,7 +7,7 @@ import '../../../common/ui.dart';
 import '../media_model.dart';
 
 abstract class Model {
-  late String id;
+   String? id;
 
   bool get hasData => id != null;
 
@@ -58,7 +58,7 @@ abstract class Model {
     }
   }
 
-  String transStringFromJson(Map<String, dynamic> json, String attribute, {String defaultValue = '', required String defaultLocale}) {
+  String transStringFromJson(Map<String, dynamic> json, String attribute, {String defaultValue = '',  String? defaultLocale}) {
     try {
       if (json[attribute] != null) {
         if (json[attribute] is Map<String, dynamic>) {
@@ -86,7 +86,7 @@ abstract class Model {
     }
   }
 
-  DateTime dateFromJson(Map<String, dynamic> json, String attribute, {required DateTime defaultValue}) {
+  DateTime? dateFromJson(Map<String, dynamic> json, String attribute, { DateTime? defaultValue}) {
     try {
       return json != null
           ? json[attribute] != null

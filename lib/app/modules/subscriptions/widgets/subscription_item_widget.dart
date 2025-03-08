@@ -8,7 +8,7 @@ import '../../../models/e_provider_subscription_model.dart';
 class SubscriptionItemWidget extends StatelessWidget {
   final EProviderSubscription subscription;
 
-  SubscriptionItemWidget({Key key, this.subscription}) : super(key: key);
+  SubscriptionItemWidget({Key? key, required this.subscription}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +21,8 @@ class SubscriptionItemWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            this.subscription.eProvider.name,
-            style: Get.textTheme.bodyText2,
+            this.subscription.eProvider!.name ?? '',
+            style: Get.textTheme.bodyMedium,
           ),
           Divider(
             height: 30,
@@ -37,28 +37,28 @@ class SubscriptionItemWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   RichText(
-                    text: TextSpan(text: "Starts At".tr, style: Get.textTheme.bodyText1, children: <TextSpan>[
+                    text: TextSpan(text: "Starts At".tr, style: Get.textTheme.bodyLarge, children: <TextSpan>[
                       TextSpan(
-                        text: DateFormat('  d, MMMM y  HH:mm', Get.locale.toString()).format(subscription.startsAt),
-                        style: Get.textTheme.caption,
+                        text: DateFormat('  d, MMMM y  HH:mm', Get.locale.toString()).format(subscription.startsAt ?? DateTime.now()),
+                        style: Get.textTheme.bodySmall,
                       ),
                     ]),
                   ),
                   RichText(
-                    text: TextSpan(text: "Expires At".tr, style: Get.textTheme.bodyText1, children: <TextSpan>[
+                    text: TextSpan(text: "Expires At".tr, style: Get.textTheme.bodyLarge, children: <TextSpan>[
                       TextSpan(
-                        text: DateFormat('  d, MMMM y  HH:mm', Get.locale.toString()).format(subscription.expiresAt),
-                        style: Get.textTheme.caption,
+                        text: DateFormat('  d, MMMM y  HH:mm', Get.locale.toString()).format(subscription.expiresAt ?? DateTime.now()),
+                        style: Get.textTheme.bodySmall,
                       ),
                     ]),
                   ),
                 ],
               ),
-              if (subscription.active)
+              if (subscription.active!)
                 Container(
                   child: Text("Enabled".tr,
                       maxLines: 1,
-                      style: Get.textTheme.bodyText2.merge(
+                      style: Get.textTheme.bodyMedium!.merge(
                         TextStyle(color: Colors.green),
                       ),
                       softWrap: false,
@@ -70,11 +70,11 @@ class SubscriptionItemWidget extends StatelessWidget {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 ),
-              if (!subscription.active)
+              if (!subscription.active! )
                 Container(
                   child: Text("Disabled".tr,
                       maxLines: 1,
-                      style: Get.textTheme.bodyText2.merge(
+                      style: Get.textTheme.bodyMedium!.merge(
                         TextStyle(color: Colors.grey),
                       ),
                       softWrap: false,
@@ -94,7 +94,7 @@ class SubscriptionItemWidget extends StatelessWidget {
               Expanded(
                 child: Text(
                   "Payment Method".tr,
-                  style: Get.textTheme.bodyText1,
+                  style: Get.textTheme.bodyLarge,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -105,8 +105,8 @@ class SubscriptionItemWidget extends StatelessWidget {
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 child: Text(
-                  subscription.payment?.paymentMethod?.getName(),
-                  style: Get.textTheme.bodyText2,
+                  subscription.payment!.paymentMethod!.getName(),
+                  style: Get.textTheme.bodyMedium,
                 ),
               ),
             ],
@@ -116,15 +116,15 @@ class SubscriptionItemWidget extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  subscription.subscriptionPackage.name,
-                  style: Get.textTheme.headline6,
+                  subscription.subscriptionPackage!.name!,
+                  style: Get.textTheme.titleLarge,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (subscription.payment != null)
                 Ui.getPrice(
-                  subscription.payment.amount,
-                  style: Get.textTheme.headline6,
+                  subscription.payment!.amount ?? 0.0,
+                  style: Get.textTheme.titleLarge,
                 ),
             ],
           ),

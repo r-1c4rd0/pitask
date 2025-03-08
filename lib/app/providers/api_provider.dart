@@ -23,7 +23,7 @@ mixin ApiClient {
   }
 
   String getApiBaseUrl(String path) {
-    String _apiPath = globalService.global.value.apiPath;
+    String _apiPath = globalService.global.value.apiPath!;
     if (path.startsWith('/')) {
       return getBaseUrl(_apiPath) + path.substring(1);
     }

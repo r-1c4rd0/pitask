@@ -10,23 +10,23 @@ import 'tax_model.dart';
 import 'user_model.dart';
 
 class Booking extends Model {
-  String id;
-  String hint;
-  bool cancel;
-  double duration;
-  int quantity;
-  BookingStatus status;
-  User user;
-  EService eService;
-  EProvider eProvider;
-  List<Option> options;
-  List<Tax> taxes;
-  Address address;
-  Coupon coupon;
-  DateTime bookingAt;
-  DateTime startAt;
-  DateTime endsAt;
-  Payment payment;
+  String? id;
+  String? hint;
+  bool? cancel;
+  double? duration;
+  int? quantity;
+  BookingStatus? status;
+  User? user;
+  EService? eService;
+  EProvider? eProvider;
+  List<Option>? options;
+  List<Tax>? taxes;
+  Address? address;
+  Coupon? coupon;
+  DateTime? bookingAt;
+  DateTime? startAt;
+  DateTime? endsAt;
+  Payment? payment;
 
   Booking(
       {this.id,
@@ -62,9 +62,9 @@ class Booking extends Model {
     payment = objectFromJson(json, 'payment', (v) => Payment.fromJson(v));
     options = listFromJson(json, 'options', (v) => Option.fromJson(v));
     taxes = listFromJson(json, 'taxes', (v) => Tax.fromJson(v));
-    bookingAt = dateFromJson(json, 'booking_at', defaultValue: null);
-    startAt = dateFromJson(json, 'start_at', defaultValue: null);
-    endsAt = dateFromJson(json, 'ends_at', defaultValue: null);
+    bookingAt = dateFromJson(json, 'booking_at', defaultValue: DateTime.now());
+    startAt = dateFromJson(json, 'start_at', defaultValue: DateTime.now());
+    endsAt = dateFromJson(json, 'ends_at', defaultValue: DateTime.now());
   }
 
   Map<String, dynamic> toJson() {
@@ -85,43 +85,43 @@ class Booking extends Model {
       data['cancel'] = this.cancel;
     }
     if (this.status != null) {
-      data['booking_status_id'] = this.status.id;
+      data['booking_status_id'] = this.status!.id;
     }
-    if (this.coupon != null && this.coupon.code != null) {
-      data['coupon'] = this.coupon.toJson();
+    if (this.coupon != null && this.coupon!.code != null) {
+      data['coupon'] = this.coupon!.toJson();
     }
-    if (this.coupon != null && this.coupon.id != null) {
-      data['coupon_id'] = this.coupon.id;
+    if (this.coupon != null && this.coupon!.id != null) {
+      data['coupon_id'] = this.coupon!.id;
     }
     if (this.taxes != null) {
-      data['taxes'] = this.taxes.map((e) => e.toJson()).toList();
+      data['taxes'] = this.taxes!.map((e) => e.toJson()).toList();
     }
-    if (this.options != null && this.options.isNotEmpty) {
-      data['options'] = this.options.map((e) => e.id).toList();
+    if (this.options != null && this.options!.isNotEmpty) {
+      data['options'] = this.options!.map((e) => e.id).toList();
     }
     if (this.user != null) {
-      data['user_id'] = this.user.id;
+      data['user_id'] = this.user!.id;
     }
     if (this.address != null) {
-      data['address'] = this.address.toJson();
+      data['address'] = this.address!.toJson();
     }
     if (this.eService != null) {
-      data['e_service'] = this.eService.id;
+      data['e_service'] = this.eService!.id;
     }
     if (this.eProvider != null) {
-      data['e_provider'] = this.eProvider.toJson();
+      data['e_provider'] = this.eProvider!.toJson();
     }
     if (this.payment != null) {
-      data['payment'] = this.payment.toJson();
+      data['payment'] = this.payment!.toJson();
     }
     if (this.bookingAt != null) {
-      data['booking_at'] = bookingAt.toUtc().toString();
+      data['booking_at'] = bookingAt!.toUtc().toString();
     }
     if (this.startAt != null) {
-      data['start_at'] = startAt.toUtc().toString();
+      data['start_at'] = startAt!.toUtc().toString();
     }
     if (this.endsAt != null) {
-      data['ends_at'] = endsAt.toUtc().toString();
+      data['ends_at'] = endsAt!.toUtc().toString();
     }
     return data;
   }
@@ -138,9 +138,9 @@ class Booking extends Model {
     double taxValue = 0.0;
     taxes?.forEach((element) {
       if (element.type == 'percent') {
-        taxValue += (total * element.value / 100);
+        taxValue += (total * (element.value ?? 0.0) / 100);
       } else {
-        taxValue += element.value;
+        taxValue += element.value ?? 0.0;
       }
     });
     return taxValue;
@@ -151,32 +151,32 @@ class Booking extends Model {
     if (coupon == null || !(coupon?.hasData ?? false)) {
       return 0;
     } else {
-      if (coupon.discountType == 'percent') {
-        return -(total * coupon.discount / 100);
+      if (coupon!.discountType == 'percent') {
+        return -(total * (coupon!.discount ?? 0) / 100);
       } else {
-        return -coupon.discount;
+        return -coupon!.discount!;
       }
     }
   }
 
   double getSubtotal() {
     double total = 0.0;
-    if (eService.priceUnit == 'fixed') {
-      total = eService.getPrice * (quantity >= 1 ? quantity : 1);
+    if (eService!.priceUnit == 'fixed') {
+      total = eService!.getPrice * ((quantity ?? 0) >= 1 ? (quantity ?? 0) : 1);
       options?.forEach((element) {
-        total += element.price * (quantity >= 1 ? quantity : 1);
+        total += (element.price! * ((quantity ?? 0) >= 1 ? (quantity ?? 0) : 1))!;
       });
     } else {
-      total = eService.getPrice * duration;
+      total = eService!.getPrice * duration!;
       options?.forEach((element) {
-        total += element.price;
+        total += element.price!;
       });
     }
     return total;
   }
 
   @override
-  bool operator ==(Object other) =>
+  bool operator ==(dynamic other) =>
       identical(this, other) ||
       super == other &&
           other is Booking &&

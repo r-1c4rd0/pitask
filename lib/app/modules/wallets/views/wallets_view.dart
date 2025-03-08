@@ -18,7 +18,7 @@ class WalletsView extends GetView<WalletsController> {
         appBar: AppBar(
           title: Text(
             "Wallets".tr,
-            style: Get.textTheme.headline6,
+            style: Get.textTheme.titleLarge,
           ),
           centerTitle: true,
           backgroundColor: Colors.transparent,
@@ -79,7 +79,7 @@ class WalletsView extends GetView<WalletsController> {
                           });
                     }),
                   ),
-                  Text("Wallet Transactions".tr, style: Get.textTheme.headline5).paddingOnly(top: 25, bottom: 10, right: 22, left: 22),
+                  Text("Wallet Transactions".tr, style: Get.textTheme.headlineSmall).paddingOnly(top: 25, bottom: 10, right: 22, left: 22),
                   Obx(() {
                     if (Get.find<LaravelApiClient>().isLoading(task: 'getWalletTransactions')) {
                       return WalletTransactionsLoadingListWidget();

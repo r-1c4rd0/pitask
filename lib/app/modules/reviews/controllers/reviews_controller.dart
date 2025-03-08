@@ -9,11 +9,7 @@ class ReviewsController extends GetxController {
   final reviews = <Review>[].obs;
   final totalReviews = 0.obs;
   final rate = 0.0.obs;
-  EProviderRepository _eProviderRepository;
-
-  ReviewsController() {
-    _eProviderRepository = new EProviderRepository();
-  }
+  EProviderRepository _eProviderRepository = EProviderRepository();
 
   @override
   void onInit() {
@@ -35,9 +31,9 @@ class ReviewsController extends GetxController {
 
   Future getReviews() async {
     try {
-      reviews.assignAll(await _eProviderRepository.getReviews(Get.find<AuthService>().user.value.id));
+      reviews.assignAll(await _eProviderRepository.getReviews(Get.find<AuthService>().user.value.id??''));
       totalReviews.value = reviews.length;
-      rate.value = reviews.map((element) => element.rate).reduce((value, element) => value + element) / reviews.length;
+      rate.value = (reviews.map((element) => element.rate).reduce((value, element) => value! + element!)! / reviews.length)!;
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }

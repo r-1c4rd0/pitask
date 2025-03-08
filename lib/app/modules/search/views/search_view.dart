@@ -3,17 +3,18 @@ import 'package:get/get.dart';
 
 import '../../../../common/ui.dart';
 import '../../global_widgets/filter_bottom_sheet_widget.dart';
-import '../controllers/search_controller.dart';
+import '../controllers/search_controller.dart' as custom; // ✅ Usa um prefixo
+
 import '../widgets/search_services_list_widget.dart';
 
-class SearchView extends GetView<SearchController> {
+class SearchView extends GetView<custom.SearchController> { // ✅ Referencia com o prefixo
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "Search".tr,
-          style: context.textTheme.headline6,
+          style: context.textTheme.titleLarge,
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -56,7 +57,7 @@ class SearchView extends GetView<SearchController> {
                 color: Get.theme.primaryColor,
                 child: TextField(
                   controller: controller.textEditingController,
-                  style: Get.textTheme.bodyText2,
+                  style: Get.textTheme.bodyMedium,
                   onSubmitted: (value) {
                     controller.searchEServices(keywords: value);
                   },
@@ -86,7 +87,7 @@ class SearchView extends GetView<SearchController> {
                   children: [
                     Text(
                       "Filter".tr,
-                      style: Get.textTheme.bodyText2, //TextStyle(color: Get.theme.hintColor),
+                      style: Get.textTheme.bodyMedium,
                     ),
                     Icon(
                       Icons.filter_list,

@@ -13,7 +13,7 @@ import '../../../../common/ui.dart';
 
 class LanguagesLoaderWidget extends StatelessWidget {
   const LanguagesLoaderWidget({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -24,7 +24,7 @@ class LanguagesLoaderWidget extends StatelessWidget {
       decoration: Ui.getBoxDecoration(),
       child: Shimmer.fromColors(
         baseColor: Colors.grey.withOpacity(0.1),
-        highlightColor: Colors.grey[200].withOpacity(0.1),
+        highlightColor: Colors.grey[200]!.withOpacity(0.1),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: List.generate(

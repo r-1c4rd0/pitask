@@ -14,8 +14,8 @@ import 'booking_options_popup_menu_widget.dart';
 
 class BookingsListItemWidget extends StatelessWidget {
   const BookingsListItemWidget({
-    Key key,
-    @required Booking booking,
+    Key? key,
+    required Booking booking,
   })  : _booking = booking,
         super(key: key);
 
@@ -23,7 +23,7 @@ class BookingsListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color _color = _booking.cancel ? Get.theme.focusColor : Get.theme.colorScheme.secondary;
+    Color _color = _booking.cancel! ? Get.theme.focusColor : Get.theme.colorScheme.secondary;
     return GestureDetector(
       onTap: () {
         Get.toNamed(Routes.BOOKING, arguments: _booking);
@@ -43,7 +43,7 @@ class BookingsListItemWidget extends StatelessWidget {
                     height: 80,
                     width: 80,
                     fit: BoxFit.cover,
-                    imageUrl: _booking.eService.firstImageThumb,
+                    imageUrl: _booking.eService!.firstImageThumb,
                     placeholder: (context, url) => Image.asset(
                       'assets/img/loading.gif',
                       fit: BoxFit.cover,
@@ -56,8 +56,8 @@ class BookingsListItemWidget extends StatelessWidget {
                 if (_booking.payment != null)
                   Container(
                     width: 80,
-                    child: Text(_booking.payment.paymentStatus?.status ?? '',
-                        style: Get.textTheme.caption.merge(
+                    child: Text(_booking.payment!.paymentStatus?.status ?? '',
+                        style: Get.textTheme.bodySmall!.merge(
                           TextStyle(fontSize: 10),
                         ),
                         maxLines: 1,
@@ -73,25 +73,25 @@ class BookingsListItemWidget extends StatelessWidget {
                   width: 80,
                   child: Column(
                     children: [
-                      Text(DateFormat('HH:mm').format(_booking.bookingAt),
+                      Text(DateFormat('HH:mm').format(_booking.bookingAt ?? DateTime.now()),
                           maxLines: 1,
-                          style: Get.textTheme.bodyText2.merge(
+                          style: Get.textTheme.bodyMedium!.merge(
                             TextStyle(color: Get.theme.primaryColor, height: 1.4),
                           ),
                           softWrap: false,
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.fade),
-                      Text(DateFormat('dd').format(_booking.bookingAt),
+                      Text(DateFormat('dd').format(_booking.bookingAt!),
                           maxLines: 1,
-                          style: Get.textTheme.headline3.merge(
+                          style: Get.textTheme.displaySmall!.merge(
                             TextStyle(color: Get.theme.primaryColor, height: 1),
                           ),
                           softWrap: false,
                           textAlign: TextAlign.center,
                           overflow: TextOverflow.fade),
-                      Text(DateFormat('MMM').format(_booking.bookingAt),
+                      Text(DateFormat('MMM').format(_booking.bookingAt!),
                           maxLines: 1,
-                          style: Get.textTheme.bodyText2.merge(
+                          style: Get.textTheme.bodyMedium!.merge(
                             TextStyle(color: Get.theme.primaryColor, height: 1),
                           ),
                           softWrap: false,
@@ -110,7 +110,7 @@ class BookingsListItemWidget extends StatelessWidget {
             SizedBox(width: 12),
             Expanded(
               child: Opacity(
-                opacity: _booking.cancel ? 0.3 : 1,
+                opacity: _booking.cancel! ? 0.3 : 1,
                 child: Wrap(
                   runSpacing: 10,
                   alignment: WrapAlignment.start,
@@ -120,7 +120,7 @@ class BookingsListItemWidget extends StatelessWidget {
                         Expanded(
                           child: Text(
                             _booking.eService?.name ?? '',
-                            style: Get.textTheme.bodyText2,
+                            style: Get.textTheme.bodyMedium,
                             maxLines: 3,
                             // textAlign: TextAlign.end,
                           ),
@@ -139,11 +139,11 @@ class BookingsListItemWidget extends StatelessWidget {
                         SizedBox(width: 5),
                         Flexible(
                           child: Text(
-                            _booking.eProvider.name,
+                            _booking.eProvider!.name ?? '',
                             maxLines: 1,
                             overflow: TextOverflow.fade,
                             softWrap: false,
-                            style: Get.textTheme.bodyText1,
+                            style: Get.textTheme.bodyLarge,
                           ),
                         ),
                       ],
@@ -158,11 +158,11 @@ class BookingsListItemWidget extends StatelessWidget {
                         SizedBox(width: 5),
                         Flexible(
                           child: Text(
-                            _booking.address.address,
+                            _booking.address!.address ?? '',
                             maxLines: 1,
                             overflow: TextOverflow.fade,
                             softWrap: false,
-                            style: Get.textTheme.bodyText1,
+                            style: Get.textTheme.bodyLarge,
                           ),
                         ),
                       ],
@@ -178,7 +178,7 @@ class BookingsListItemWidget extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.fade,
                             softWrap: false,
-                            style: Get.textTheme.bodyText1,
+                            style: Get.textTheme.bodyLarge,
                           ),
                         ),
                         Expanded(
@@ -187,7 +187,7 @@ class BookingsListItemWidget extends StatelessWidget {
                             alignment: AlignmentDirectional.centerEnd,
                             child: Ui.getPrice(
                               _booking.getTotal(),
-                              style: Get.textTheme.headline6.merge(TextStyle(color: _color)),
+                              style: Get.textTheme.titleLarge!.merge(TextStyle(color: _color)),
                             ),
                           ),
                         ),

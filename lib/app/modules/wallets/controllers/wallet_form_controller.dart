@@ -42,8 +42,7 @@ class WalletFormController extends GetxController {
         //Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
       }
     } else {
-     // Get.showSnackbar(Ui.ErrorSnackBar(
-          message: "There are errors in some fields please correct them!".tr));
+     // Get.showSnackbar(Ui.ErrorSnackBar( message: "There are errors in some fields please correct them!".tr));
     }
   }
 
@@ -56,11 +55,10 @@ class WalletFormController extends GetxController {
         await _paymentRepository.updateWallet(wallet.value);
         await Get.offAndToNamed(Routes.WALLETS);
       } catch (e) {
-        Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+       // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
       }
     } else {
-      Get.showSnackbar(Ui.ErrorSnackBar(
-          message: "There are errors in some fields please correct them!".tr));
+     // Get.showSnackbar(Ui.ErrorSnackBar(message: "There are errors in some fields please correct them!".tr));
     }
   }
 

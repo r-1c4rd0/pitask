@@ -15,26 +15,26 @@ import 'tax_model.dart';
 import 'user_model.dart';
 
 class EProvider extends Model {
-  String id;
-  String name;
-  String description;
-  List<Media> images;
-  String phoneNumber;
-  String mobileNumber;
-  EProviderType type;
-  List<AvailabilityHour> availabilityHours;
-  double availabilityRange;
-  bool available;
-  bool featured;
-  List<Address> addresses;
-  List<Tax> taxes;
+  String? id;
+  String? name;
+  String? description;
+  List<Media>? images;
+  String? phoneNumber;
+  String? mobileNumber;
+  EProviderType? type;
+  List<AvailabilityHour>? availabilityHours;
+  double? availabilityRange;
+  bool? available;
+  bool? featured;
+  List<Address>? addresses;
+  List<Tax>? taxes;
 
-  List<User> employees;
-  double rate;
-  List<Review> reviews;
-  int totalReviews;
-  bool verified;
-  int bookingsInProgress;
+  List<User>? employees;
+  double? rate;
+  List<Review>? reviews;
+  int? totalReviews;
+  bool? verified;
+  int? bookingsInProgress;
 
   EProvider(
       {this.id,
@@ -73,7 +73,7 @@ class EProvider extends Model {
     employees = listFromJson(json, 'users', (v) => User.fromJson(v));
     rate = doubleFromJson(json, 'rate');
     reviews = listFromJson(json, 'e_provider_reviews', (v) => Review.fromJson(v));
-    totalReviews = reviews.isEmpty ? intFromJson(json, 'total_reviews') : reviews.length;
+    totalReviews = reviews!.isEmpty ? intFromJson(json, 'total_reviews') : reviews!.length;
     verified = boolFromJson(json, 'verified');
     bookingsInProgress = intFromJson(json, 'bookings_in_progress');
   }
@@ -90,19 +90,19 @@ class EProvider extends Model {
     if (totalReviews != null) data['total_reviews'] = this.totalReviews;
     if (verified != null) data['verified'] = this.verified;
     if (this.type != null) {
-      data['e_provider_type_id'] = this.type.id;
+      data['e_provider_type_id'] = this.type!.id;
     }
     if (this.images != null) {
-      data['image'] = this.images.where((element) => Uuid.isUuid(element.id)).map((v) => v.id).toList();
+      data['image'] = this.images!.where((element) => Uuid.isUuid(element.id!)).map((v) => v.id).toList();
     }
     if (this.addresses != null) {
-      data['addresses'] = this.addresses.map((v) => v?.id).toList();
+      data['addresses'] = this.addresses!.map((v) => v?.id).toList();
     }
     if (this.employees != null) {
-      data['employees'] = this.employees.map((v) => v?.id).toList();
+      data['employees'] = this.employees!.map((v) => v?.id).toList();
     }
     if (this.taxes != null) {
-      data['taxes'] = this.taxes.map((v) => v?.id).toList();
+      data['taxes'] = this.taxes!.map((v) => v?.id).toList();
     }
     if (this.availabilityRange != null) {
       data['availability_range'] = availabilityRange;
@@ -116,9 +116,9 @@ class EProvider extends Model {
 
   String get firstImageIcon => this.images?.first?.icon ?? '';
 
-  String get firstAddress {
-    if (this.addresses.isNotEmpty) {
-      return this.addresses.first?.address;
+  String? get firstAddress {
+    if (this.addresses!.isNotEmpty) {
+      return this.addresses!.first.address;
     }
     return '';
   }
@@ -130,11 +130,11 @@ class EProvider extends Model {
 
   Map<String, List<AvailabilityHour>> groupedAvailabilityHours() {
     Map<String, List<AvailabilityHour>> result = {};
-    this.availabilityHours.forEach((element) {
+    this.availabilityHours!.forEach((element) {
       if (result.containsKey(element.day)) {
-        result[element.day].add(element);
+        result[element.day]!.add(element);
       } else {
-        result[element.day] = [element];
+        result[element.day ??''] = [element];
       }
     });
     return result;
@@ -142,16 +142,16 @@ class EProvider extends Model {
 
   List<String> getAvailabilityHoursData(String day) {
     List<String> result = [];
-    this.availabilityHours.forEach((element) {
+    this.availabilityHours!.forEach((element) {
       if (element.day == day) {
-        result.add(element.data);
+        result.add(element.data ?? '');
       }
     });
     return result;
   }
 
   @override
-  bool operator ==(Object other) =>
+  bool operator ==(dynamic other) =>
       identical(this, other) ||
       super == other &&
           other is EProvider &&

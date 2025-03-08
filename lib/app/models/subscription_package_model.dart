@@ -1,19 +1,19 @@
 import 'parents/model.dart';
 
 class SubscriptionPackage extends Model {
-  String id;
-  String name;
-  String description;
-  double price;
-  double discountPrice;
-  int durationInDays;
+  String? id;
+  String? name;
+  String? description;
+  double? price;
+  double? discountPrice;
+  int? durationInDays;
 
   SubscriptionPackage({this.id, this.name, this.description, this.price, this.discountPrice, this.durationInDays});
 
   SubscriptionPackage.fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
-    name = transStringFromJson(json, 'name');
-    description = transStringFromJson(json, 'description');
+    name = transStringFromJson(json, 'name', defaultLocale: '');
+    description = transStringFromJson(json, 'description', defaultLocale: '');
     price = doubleFromJson(json, 'price');
     discountPrice = doubleFromJson(json, 'discount_price');
     durationInDays = intFromJson(json, 'duration_in_days');
@@ -36,14 +36,16 @@ class SubscriptionPackage extends Model {
   * when the discount not set, then it return the price
   * otherwise it return the discount price instead
   * */
-  double get getPrice {
+  double? get getPrice {
     return (discountPrice ?? 0) > 0 ? discountPrice : price;
   }
 
   /*
   * Get discount price
   * */
-  double get getOldPrice {
+  double? get getOldPrice {
     return (discountPrice ?? 0) > 0 ? price : 0;
   }
+
+  get oldPrice => null;
 }

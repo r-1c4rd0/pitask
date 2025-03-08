@@ -17,7 +17,7 @@ class SubscriptionsView extends GetView<SubscriptionsController> {
         iconTheme: IconThemeData(color: Get.theme.hintColor),
         title: Text(
           "Subscriptions".tr,
-          style: Get.textTheme.headline6.merge(TextStyle(letterSpacing: 1.3, color: Get.theme.hintColor)),
+          style: Get.textTheme.titleLarge!.merge(TextStyle(letterSpacing: 1.3, color: Get.theme.hintColor)),
         ),
         automaticallyImplyLeading: false,
         leading: new IconButton(
@@ -38,9 +38,9 @@ class SubscriptionsView extends GetView<SubscriptionsController> {
           primary: true,
           shrinkWrap: false,
           children: <Widget>[
-            Text("Subscriptions History".tr, style: Get.textTheme.headline5),
+            Text("Subscriptions History".tr, style: Get.textTheme.headlineSmall),
             Obx(() {
-              if (controller.eProviderSubscriptions.isEmpty) return SubscriptionsListLoaderWidget(count: 4);
+              if (controller.eProviderSubscriptions.isEmpty) return SubscriptionsListLoaderWidget(count: 4, itemHeight: 0.0,);
               return ListView.separated(
                 padding: EdgeInsets.symmetric(vertical: 15),
                 scrollDirection: Axis.vertical,

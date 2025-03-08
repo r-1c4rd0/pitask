@@ -7,9 +7,9 @@ import 'dart:core';
 import 'parents/model.dart';
 
 class EProviderType extends Model {
-  String id;
-  String name;
-  double commission;
+  String? id;
+  String? name;
+  double? commission;
 
   EProviderType({this.id, this.name, this.commission});
 

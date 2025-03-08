@@ -7,14 +7,14 @@ import 'parents/model.dart';
 import 'wallet_model.dart';
 
 class PaymentMethod extends Model {
-  String id;
-  String name;
-  String description;
-  Media logo;
-  String route;
-  int order;
-  bool isDefault;
-  Wallet wallet;
+  String? id;
+  String? name;
+  String? description;
+  Media? logo;
+  String? route;
+  int? order;
+  bool? isDefault;
+  Wallet? wallet;
 
   PaymentMethod({this.id, this.name, this.description, this.route, this.logo, this.wallet, this.isDefault = false});
 
@@ -38,11 +38,11 @@ class PaymentMethod extends Model {
 
   String getName() {
     name = name ?? "Not Paid".tr;
-    return name.substring(name.length - min(name.length, 10), name.length);
+    return name!.substring(name!.length - min(name!.length, 10), name!.length);
   }
 
   @override
-  bool operator ==(Object other) =>
+  bool operator ==(dynamic other) =>
       identical(this, other) ||
       super == other &&
           other is PaymentMethod &&

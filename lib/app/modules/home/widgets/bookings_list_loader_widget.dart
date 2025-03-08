@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class BookingsListLoaderWidget extends StatelessWidget {
-  BookingsListLoaderWidget({Key key}) : super(key: key);
+  BookingsListLoaderWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class BookingsListLoaderWidget extends StatelessWidget {
         itemBuilder: (_, index) {
           return Shimmer.fromColors(
             baseColor: Colors.grey.withOpacity(0.1),
-            highlightColor: Colors.grey[200].withOpacity(0.1),
+            highlightColor: Colors.grey[200]!.withOpacity(0.1),
             child: Container(
               width: double.maxFinite,
               height: 180,

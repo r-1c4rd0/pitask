@@ -1,33 +1,33 @@
 import 'parents/model.dart';
 
 class Setting extends Model {
-  String appName;
-  String providerAppName;
-  bool enableStripe;
-  String defaultTax;
-  String defaultCurrency;
-  String fcmKey;
-  bool enablePaypal;
-  String defaultTheme;
-  String mainColor;
-  String mainDarkColor;
-  String secondColor;
-  String secondDarkColor;
-  String accentColor;
-  String accentDarkColor;
-  String scaffoldDarkColor;
-  String scaffoldColor;
-  String googleMapsKey;
-  String mobileLanguage;
-  String defaultCountryCode;
-  String appVersion;
-  bool enableVersion;
-  bool currencyRight;
-  int defaultCurrencyDecimalDigits;
-  bool enableRazorpay;
-  String distanceUnit;
-  bool enableOtp;
-  List modules;
+  String? appName;
+  String? providerAppName;
+  bool? enableStripe;
+  String? defaultTax;
+  String? defaultCurrency;
+  String? fcmKey;
+  bool? enablePaypal;
+  String? defaultTheme;
+  String? mainColor;
+  String? mainDarkColor;
+  String? secondColor;
+  String? secondDarkColor;
+  String? accentColor;
+  String? accentDarkColor;
+  String? scaffoldDarkColor;
+  String? scaffoldColor;
+  String? googleMapsKey;
+  String? mobileLanguage;
+  String? defaultCountryCode;
+  String? appVersion;
+  bool? enableVersion;
+  bool? currencyRight;
+  int? defaultCurrencyDecimalDigits;
+  bool? enableRazorpay;
+  String? distanceUnit;
+  bool? enableOtp;
+  List? modules;
 
   Setting(
       {this.appName,

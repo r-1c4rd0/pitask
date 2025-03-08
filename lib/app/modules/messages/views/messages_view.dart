@@ -60,7 +60,7 @@ class MessagesView extends GetView<MessagesController> {
       appBar: AppBar(
         title: Text(
           "Chats".tr,
-          style: Get.textTheme.headline6,
+          style: Get.textTheme.titleLarge,
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -75,7 +75,7 @@ class MessagesView extends GetView<MessagesController> {
       body: RefreshIndicator(
           onRefresh: () async {
             controller.messages.clear();
-            controller.lastDocument = new Rx<DocumentSnapshot>(null);
+            controller.lastDocument = new Rx<DocumentSnapshot?>(null);
             await controller.listenForMessages();
           },
           child: conversationsList()),

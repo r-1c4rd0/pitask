@@ -2,10 +2,10 @@ import 'option_model.dart';
 import 'parents/model.dart';
 
 class OptionGroup extends Model {
-  String id;
-  String name;
-  bool allowMultiple;
-  List<Option> options;
+  String? id;
+  String? name;
+  bool? allowMultiple;
+  List<Option>? options;
 
   OptionGroup({this.id, this.name, this.options});
 
@@ -25,7 +25,7 @@ class OptionGroup extends Model {
   }
 
   @override
-  bool operator ==(Object other) =>
+  bool operator ==(dynamic other) =>
       identical(this, other) ||
       super == other &&
           other is OptionGroup &&

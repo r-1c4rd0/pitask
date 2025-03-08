@@ -14,7 +14,7 @@ class SettingsView extends GetView<SettingsController> {
       appBar: AppBar(
           title: Text(
             "Settings".tr,
-            style: context.textTheme.headline6,
+            style: context.textTheme.titleLarge,
           ),
           centerTitle: true,
           backgroundColor: Colors.transparent,
@@ -56,8 +56,8 @@ class SettingsView extends GetView<SettingsController> {
           )),
       body: WillPopScope(
         onWillPop: () async {
-          if (_navigatorKey.currentState.canPop()) {
-            _navigatorKey.currentState.pop();
+          if (_navigatorKey!.currentState!.canPop()) {
+            _navigatorKey!.currentState!.pop();
             return false;
           }
           return true;

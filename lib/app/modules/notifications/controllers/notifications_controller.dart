@@ -7,11 +7,7 @@ import '../../root/controllers/root_controller.dart';
 
 class NotificationsController extends GetxController {
   final notifications = <Notification>[].obs;
-  NotificationRepository _notificationRepository;
-
-  NotificationsController() {
-    _notificationRepository = new NotificationRepository();
-  }
+  NotificationRepository _notificationRepository = NotificationRepository();
 
   @override
   void onInit() async {
@@ -19,7 +15,7 @@ class NotificationsController extends GetxController {
     super.onInit();
   }
 
-  Future refreshNotifications({bool showMessage}) async {
+  Future refreshNotifications({bool? showMessage}) async {
     await getNotifications();
     Get.find<RootController>().getNotificationsCount();
     if (showMessage == true) {
@@ -38,7 +34,7 @@ class NotificationsController extends GetxController {
   Future removeNotification(Notification notification) async {
     try {
       await _notificationRepository.remove(notification);
-      if (!notification.read) {
+      if (!notification.read!) {
         --Get.find<RootController>().notificationsCount.value;
       }
       notifications.remove(notification);
@@ -49,7 +45,7 @@ class NotificationsController extends GetxController {
 
   Future markAsReadNotification(Notification notification) async {
     try {
-      if (!notification.read) {
+      if (!notification.read!) {
         await _notificationRepository.markAsRead(notification);
         notification.read = true;
         --Get.find<RootController>().notificationsCount.value;

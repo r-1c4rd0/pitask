@@ -17,7 +17,7 @@ class ThemeModeView extends GetView<ThemeModeController> {
             : AppBar(
                 title: Text(
                   "Theme Mode".tr,
-                  style: context.textTheme.headline6,
+                  style: context.textTheme.titleLarge,
                 ),
                 centerTitle: true,
                 backgroundColor: Colors.transparent,
@@ -41,25 +41,25 @@ class ThemeModeView extends GetView<ThemeModeController> {
                     value: ThemeMode.light,
                     groupValue: controller.selectedThemeMode.value,
                     onChanged: (value) {
-                      controller.changeThemeMode(value);
+                      controller.changeThemeMode(value!);
                     },
-                    title: Text("Light Theme".tr, style: Get.textTheme.bodyText2),
+                    title: Text("Light Theme".tr, style: Get.textTheme.bodyMedium),
                   ),
                   RadioListTile(
                     value: ThemeMode.dark,
                     groupValue: controller.selectedThemeMode.value,
                     onChanged: (value) {
-                      controller.changeThemeMode(value);
+                      controller.changeThemeMode(value!);
                     },
-                    title: Text("Dark Theme".tr, style: Get.textTheme.bodyText2),
+                    title: Text("Dark Theme".tr, style: Get.textTheme.bodyMedium),
                   ),
                   RadioListTile(
                     value: ThemeMode.system,
                     groupValue: controller.selectedThemeMode.value,
                     onChanged: (value) {
-                      controller.changeThemeMode(value);
+                      controller.changeThemeMode(value!);
                     },
-                    title: Text("System Theme".tr, style: Get.textTheme.bodyText2),
+                    title: Text("System Theme".tr, style: Get.textTheme.bodyMedium),
                   ),
                 ],
               ),

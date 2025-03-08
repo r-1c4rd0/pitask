@@ -8,7 +8,7 @@ import '../controllers/notifications_controller.dart';
 import 'notification_item_widget.dart';
 
 class BookingNotificationItemWidget extends GetView<NotificationsController> {
-  BookingNotificationItemWidget({Key key, this.notification}) : super(key: key);
+  BookingNotificationItemWidget({Key? key, required this.notification}) : super(key: key);
   final model.Notification notification;
 
   @override
@@ -24,7 +24,7 @@ class BookingNotificationItemWidget extends GetView<NotificationsController> {
         size: 34,
       ),
       onTap: (notification) async {
-        Get.toNamed(Routes.BOOKING, arguments: new Booking(id: notification.data['booking_id'].toString()));
+        Get.toNamed(Routes.BOOKING, arguments: new Booking(id: notification.data?['booking_id'].toString()));
         await controller.markAsReadNotification(notification);
       },
     );

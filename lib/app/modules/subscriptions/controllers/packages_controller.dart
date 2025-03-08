@@ -12,12 +12,12 @@ class PackagesController extends GetxController {
   final subscriptionPackages = <SubscriptionPackage>[].obs;
   final eProviderSubscription = EProviderSubscription().obs;
   final eProviders = <EProvider>[].obs;
-  SubscriptionRepository _subscriptionRepository;
-  EProviderRepository _eProviderRepository;
+  SubscriptionRepository _subscriptionRepository =SubscriptionRepository();
+  EProviderRepository _eProviderRepository =  EProviderRepository();
 
   PackagesController() {
-    _subscriptionRepository = new SubscriptionRepository();
-    _eProviderRepository = new EProviderRepository();
+    _subscriptionRepository =  SubscriptionRepository();
+    _eProviderRepository =  EProviderRepository();
   }
 
   @override
@@ -26,7 +26,7 @@ class PackagesController extends GetxController {
     super.onInit();
   }
 
-  Future refreshSubscriptionPackages({bool showMessage}) async {
+  Future refreshSubscriptionPackages({bool? showMessage}) async {
     await getEProviders();
     await getSubscriptionPackages();
     if (showMessage == true) {
@@ -39,7 +39,7 @@ class PackagesController extends GetxController {
       subscriptionPackages.clear();
       subscriptionPackages.assignAll(await _subscriptionRepository.getSubscriptionPackages());
     } catch (e) {
-      Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+     // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
   }
 
@@ -48,13 +48,13 @@ class PackagesController extends GetxController {
       eProviders.clear();
       eProviders.assignAll(await _eProviderRepository.getAll());
     } catch (e) {
-      Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+     // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
   }
 
   List<SelectDialogItem<EProvider>> getSelectProvidersItems() {
     return eProviders.map((element) {
-      return SelectDialogItem(element, element.name);
+      return SelectDialogItem(element, element.name ?? '');
     }).toList();
   }
 }

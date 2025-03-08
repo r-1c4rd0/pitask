@@ -2,7 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart' hide OnTap;
 import 'package:get/get.dart';
-//import "package:intl/intl.dart" show DateFormat;
+// import "package:intl/intl.dart" show DateFormat;
+import 'package:html/parser.dart' show parse; // Adicionada importação para o método parse
 import '../app/services/settings_service.dart';
 
 class Ui {
@@ -83,7 +84,7 @@ class Ui {
   static Future<String> showTimePickerDialog(BuildContext context, String? initialTime) async {
     DateTime dateTime = DateTime.now();
     if (initialTime != null) {
-     // dateTime = DateFormat("HH:mm").parse(initialTime);
+      // dateTime = DateFormat("HH:mm").parse(initialTime);
     }
     final TimeOfDay time = TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
     final TimeOfDay? picked = await showTimePicker(
@@ -112,9 +113,164 @@ class Ui {
           fontSize: FontSize(style?.fontSize ?? 16.0),
           display: Display.inline,
           fontWeight: style?.fontWeight,
-         // width: Get.width,
+          // width: Get.width,
         ),
       },
     );
+  }
+
+  static GetSnackBar ErrorSnackBar({required String message, String title = "Erro"}) {
+    return GetSnackBar(
+      titleText: Text(
+        title,
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      messageText: Text(
+        message,
+        style: TextStyle(color: Colors.white),
+      ),
+      icon: Icon(Icons.error_outline, color: Colors.white),
+      backgroundColor: Colors.redAccent,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 3),
+      margin: EdgeInsets.all(10),
+      borderRadius: 8,
+    );
+  }
+
+  static InputDecoration getInputDecoration({
+    String? hintText,
+    String? labelText,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    EdgeInsetsGeometry? contentPadding,
+    TextStyle? hintStyle,
+  }) {
+    return InputDecoration(
+      hintText: hintText,
+      labelText: labelText,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      contentPadding: contentPadding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      hintStyle: hintStyle ?? Get.textTheme.bodySmall?.copyWith(color: Get.theme.hintColor),
+      labelStyle: Get.textTheme.bodySmall?.copyWith(color: Get.theme.focusColor),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Get.theme.focusColor.withOpacity(0.2)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Get.theme.focusColor),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.red),
+      ),
+      fillColor: Get.theme.cardColor,
+      filled: true,
+    );
+  }
+
+  static Widget removeHtml(
+      String? htmlString, {
+        TextStyle? style,
+        TextAlign textAlign = TextAlign.start,
+        bool softWrap = true,
+        TextOverflow overflow = TextOverflow.clip,
+        int? maxLines,
+      }) {
+    if (htmlString == null || htmlString.isEmpty) {
+      return const Text('');
+    }
+
+    // Parse o HTML e extraia apenas o texto
+    var document = parse(htmlString);
+    String parsedText = document.body?.text ?? '';
+
+    // Remova espaços em branco extras e quebras de linha duplicadas
+    parsedText = parsedText.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    // Retorne um widget Text com o texto limpo e o estilo fornecido
+    return Text(
+      parsedText,
+      style: style,
+      textAlign: textAlign,
+      softWrap: softWrap,
+      overflow: overflow,
+      maxLines: maxLines,
+    );
+  }
+
+  static List<Widget> getStarsList(
+      double? rate, {
+        double size = 18,
+        Color? color,
+        Color? emptyColor,
+      }) {
+    color ??= Colors.amber;
+    emptyColor ??= Colors.grey.withOpacity(0.3);
+    rate ??= 0;
+
+    // Garantir que a taxa está dentro do intervalo de 0 a 5
+    final double clampedRate = rate.clamp(0.0, 5.0);
+
+    // Retorna uma lista de widgets (estrelas)
+    return List.generate(5, (index) {
+      if (index < clampedRate.floor()) {
+        // Estrela completamente preenchida
+        return Icon(
+          Icons.star,
+          size: size,
+          color: color,
+        );
+      } else if (index == clampedRate.floor() && clampedRate % 1 != 0) {
+        // Estrela parcialmente preenchida
+        return Stack(
+          children: [
+            Icon(
+              Icons.star,
+              size: size,
+              color: emptyColor,
+            ),
+            ClipRect(
+              clipper: _StarClipper(clampedRate % 1),
+              child: Icon(
+                Icons.star,
+                size: size,
+                color: color,
+              ),
+            ),
+          ],
+        );
+      } else {
+        // Estrela vazia
+        return Icon(
+          Icons.star,
+          size: size,
+          color: emptyColor,
+        );
+      }
+    });
+  }
+}
+
+/// Clipper personalizado para criar estrelas parcialmente preenchidas
+class _StarClipper extends CustomClipper<Rect> {
+  final double fraction;
+
+  _StarClipper(this.fraction);
+
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromLTRB(0, 0, size.width * fraction, size.height);
+  }
+
+  @override
+  bool shouldReclip(_StarClipper oldClipper) {
+    return oldClipper.fraction != fraction;
   }
 }

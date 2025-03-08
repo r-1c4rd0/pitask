@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart' show DateFormat;
+import 'package:intl/intl.dart'; // ✅ Importação corrigida
 
 import '../../../../common/ui.dart';
 import '../../../models/wallet_transaction_model.dart';
 
 class WalletTransactionItem extends StatelessWidget {
   const WalletTransactionItem({
-    Key key,
-    @required WalletTransaction transaction,
-  })  : _transaction = transaction,
-        super(key: key);
+    Key? key,
+    required this.transaction,
+  }) : super(key: key);
 
-  final WalletTransaction _transaction;
+  final WalletTransaction transaction; // ✅ Removido "_" para consistência
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +19,12 @@ class WalletTransactionItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          DateFormat('  d, MMMM y - HH:mm', Get.locale.toString()).format(_transaction.dateTime),
-          style: Get.textTheme.caption,
+          DateFormat('d, MMMM y - HH:mm', Get.locale?.languageCode ?? 'en').format(transaction.dateTime!),
+          style: Get.textTheme.bodySmall,
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Container(
-          padding: EdgeInsets.all(15),
+          padding: const EdgeInsets.all(15),
           decoration: Ui.getBoxDecoration(color: Get.theme.primaryColor),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -37,24 +36,26 @@ class WalletTransactionItem extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     Text(
-                      _transaction.user.name,
+                      transaction.user?.name ?? "Usuário desconhecido", // ✅ Evita erro se for null
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
-                      style: Get.textTheme.bodyText2,
+                      style: Get.textTheme.bodyMedium,
                     ),
                     Text(
-                      _transaction.description,
-                      style: Get.textTheme.caption,
+                      transaction.description ?? "Sem descrição", // ✅ Evita erro se for null
+                      style: Get.textTheme.bodySmall,
                     ),
                   ],
                 ),
               ),
-              if (_transaction.action == TransactionActions.CREDIT) Ui.getPrice(_transaction.amount, style: Get.textTheme.headline5.merge(TextStyle(color: Colors.green))),
-              if (_transaction.action == TransactionActions.DEBIT) Ui.getPrice(-_transaction.amount, style: Get.textTheme.headline5.merge(TextStyle(color: Colors.red))),
+              if (transaction.action == TransactionActions.CREDIT)
+                Ui.getPrice(transaction.amount!, style: Get.textTheme.headlineSmall?.copyWith(color: Colors.green)),
+              if (transaction.action == TransactionActions.DEBIT)
+                Ui.getPrice(-transaction.amount!, style: Get.textTheme.headlineSmall?.copyWith(color: Colors.red)),
             ],
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }

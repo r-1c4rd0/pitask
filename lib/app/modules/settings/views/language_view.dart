@@ -20,7 +20,7 @@ class LanguageView extends GetView<LanguageController> {
             : AppBar(
                 title: Text(
                   "Languages".tr,
-                  style: context.textTheme.headline6,
+                  style: context.textTheme.titleLarge,
                 ),
                 centerTitle: true,
                 backgroundColor: Colors.transparent,
@@ -43,8 +43,8 @@ class LanguageView extends GetView<LanguageController> {
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 decoration: Ui.getBoxDecoration(),
                 child: Column(
-                  children: List.generate(TranslationService.languages.length, (index) {
-                    var _lang = TranslationService.languages.elementAt(index);
+                  children: List.generate(Get.find<TranslationService>().languages.length, (index) {
+                    var _lang = Get.find<TranslationService>().languages.elementAt(index);
                     return RadioListTile(
                       value: _lang,
                       groupValue: Get.locale.toString(),
@@ -52,7 +52,7 @@ class LanguageView extends GetView<LanguageController> {
                       onChanged: (value) {
                         controller.updateLocale(value);
                       },
-                      title: Text(_lang.tr, style: Get.textTheme.bodyText2),
+                      title: Text(_lang.tr, style: Get.textTheme.bodyMedium),
                     );
                   }).toList(),
                 ),

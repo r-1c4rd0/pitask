@@ -1,16 +1,16 @@
 import 'parents/model.dart';
 
 class Tax extends Model {
-  String id;
-  String name;
-  String type;
-  double value;
+  String? id;
+  String? name;
+  String? type;
+  double? value;
 
   Tax(this.id, this.name, this.type, this.value);
 
   Tax.fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
-    name = transStringFromJson(json, 'name');
+    name = transStringFromJson(json, 'name', defaultLocale: '');
     type = stringFromJson(json, 'type');
     value = doubleFromJson(json, 'value');
   }
