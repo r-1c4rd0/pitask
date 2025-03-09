@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 class ServicesEmptyListWidget extends StatelessWidget {
   const ServicesEmptyListWidget({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -64,7 +64,7 @@ class ServicesEmptyListWidget extends StatelessWidget {
             child: Text(
               "You don't have any service inside this filter".tr,
               textAlign: TextAlign.center,
-              style: Get.textTheme.headline4,
+              style: Get.textTheme.headlineMedium,
             ),
           ),
         ),

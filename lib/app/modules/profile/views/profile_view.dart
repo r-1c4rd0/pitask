@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 import '../../../models/media_model.dart';
 import '../../global_widgets/image_field_widget.dart';
@@ -131,7 +132,7 @@ class ProfileView extends GetView<ProfileController> {
                     : Text(
                         "Not Verified".tr,
                         style: Get.textTheme.bodySmall!.merge(TextStyle(color: Colors.redAccent)),
-                      ),
+                      ), onChanged: (PhoneNumber value) {  },
               ),
               TextFieldWidget(
                 onSaved: (input) => controller.user.value.address = input,

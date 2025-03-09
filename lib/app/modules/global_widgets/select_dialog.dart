@@ -9,35 +9,37 @@ class SelectDialogItem<V> {
 }
 
 class SelectDialog<V> extends StatefulWidget {
-  SelectDialog({Key key, this.items, this.initialSelectedValue, this.title, this.submitText, this.cancelText}) : super(key: key);
+  const SelectDialog({
+    Key? key,
+    required this.items,
+    this.initialSelectedValue,
+    this.title,
+    this.submitText,
+    this.cancelText,
+  }) : super(key: key);
 
   final List<SelectDialogItem<V>> items;
-  final V initialSelectedValue;
-  final String title;
-  final String submitText;
-  final String cancelText;
+  final V? initialSelectedValue;
+  final String? title;
+  final String? submitText;
+  final String? cancelText;
 
   @override
-  State<StatefulWidget> createState() => _SelectDialogState<V>();
+  State<SelectDialog<V>> createState() => _SelectDialogState<V>();
 }
 
 class _SelectDialogState<V> extends State<SelectDialog<V>> {
-  var _selectedValue;
+  V? _selectedValue;
 
+  @override
   void initState() {
     super.initState();
-    if (widget.initialSelectedValue != null) {
-      _selectedValue = widget.initialSelectedValue;
-    }
+    _selectedValue = widget.initialSelectedValue;
   }
 
   void _onItemCheckedChange(V itemValue, bool checked) {
     setState(() {
-      if (checked) {
-        _selectedValue = itemValue;
-      } else {
-        _selectedValue = null;
-      }
+      _selectedValue = checked ? itemValue : null;
     });
   }
 
@@ -53,10 +55,10 @@ class _SelectDialogState<V> extends State<SelectDialog<V>> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title ?? ""),
-      contentPadding: EdgeInsets.only(top: 12.0),
+      contentPadding: const EdgeInsets.only(top: 12.0),
       content: SingleChildScrollView(
         child: ListTileTheme(
-          contentPadding: EdgeInsets.fromLTRB(14.0, 0.0, 24.0, 0.0),
+          contentPadding: const EdgeInsets.fromLTRB(14.0, 0.0, 24.0, 0.0),
           child: ListBody(
             children: widget.items.map(_buildItem).toList(),
           ),
@@ -65,26 +67,30 @@ class _SelectDialogState<V> extends State<SelectDialog<V>> {
       actions: <Widget>[
         MaterialButton(
           elevation: 0,
-          child: Text(widget.cancelText ?? ""),
+          child: Text(widget.cancelText ?? "Cancel"),
           onPressed: _onCancelTap,
         ),
         MaterialButton(
           elevation: 0,
-          child: Text(widget.submitText ?? ""),
+          child: Text(widget.submitText ?? "OK"),
           onPressed: _onSubmitTap,
-        )
+        ),
       ],
     );
   }
 
   Widget _buildItem(SelectDialogItem<V> item) {
-    final checked = _selectedValue == item.value;
+    final bool checked = _selectedValue == item.value;
     return CheckboxListTile(
       value: checked,
       activeColor: Get.theme.colorScheme.secondary,
-      title: Text(item.label, style: Theme.of(context).textTheme.bodyText2),
+      title: Text(item.label, style: Theme.of(context).textTheme.bodyMedium),
       controlAffinity: ListTileControlAffinity.leading,
-      onChanged: (checked) => _onItemCheckedChange(item.value, checked),
+      onChanged: (bool? isChecked) {
+        if (isChecked != null) {
+          _onItemCheckedChange(item.value, isChecked);
+        }
+      },
     );
   }
 }

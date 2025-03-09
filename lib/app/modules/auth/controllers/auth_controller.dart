@@ -12,18 +12,20 @@ import '../../../services/firebase_messaging_service.dart';
 import '../../../services/settings_service.dart';
 
 class AuthController extends GetxController {
-  AuthController
   final Rx<User> currentUser = Get.find<AuthService>().user;
-  GlobalKey<FormState> loginFormKey;
-  GlobalKey<FormState> registerFormKey;
-  GlobalKey<FormState> forgotPasswordFormKey;
+  late final GlobalKey<FormState> loginFormKey;
+  late final GlobalKey<FormState> registerFormKey;
+  late final GlobalKey<FormState> forgotPasswordFormKey;
   final hidePassword = true.obs;
   final loading = false.obs;
   final smsSent = ''.obs;
-  UserRepository _userRepository;
+  late final UserRepository _userRepository;
 
   AuthController() {
     _userRepository = UserRepository();
+    loginFormKey = GlobalKey<FormState>();
+    registerFormKey = GlobalKey<FormState>();
+    forgotPasswordFormKey = GlobalKey<FormState>();
   }
 
   void login() async {
@@ -34,11 +36,12 @@ class AuthController extends GetxController {
       try {
         await Get.find<FireBaseMessagingService>().setDeviceToken();
         currentUser.value = await _userRepository.login(currentUser.value);
-        await _userRepository.signInWithEmailAndPassword(currentUser.value.email ?? "", currentUser.value.apiToken ?? "");
+        await _userRepository.signInWithEmailAndPassword(
+            currentUser.value.email ?? "", currentUser.value.apiToken ?? "");
         loading.value = false;
         await Get.toNamed(Routes.ROOT, arguments: 0);
       } catch (e) {
-       // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+        Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
       } finally {
         loading.value = false;
       }
@@ -51,14 +54,15 @@ class AuthController extends GetxController {
       registerFormKey.currentState?.save();
       loading.value = true;
       try {
-        if (Get.find<SettingsService>().setting.value.enableOtp = true ) {
+        if (Get.find<SettingsService>().setting.value.enableOtp == true) {
           await _userRepository.sendCodeToPhone();
           loading.value = false;
           await Get.toNamed(Routes.PHONE_VERIFICATION);
         } else {
           await Get.find<FireBaseMessagingService>().setDeviceToken();
           currentUser.value = await _userRepository.register(currentUser.value);
-          await _userRepository.signUpWithEmailAndPassword(currentUser.value.email  ?? "", currentUser.value.apiToken  ?? "");
+          await _userRepository.signUpWithEmailAndPassword(
+              currentUser.value.email ?? "", currentUser.value.apiToken ?? "");
           loading.value = false;
           await Get.offAllNamed(Routes.E_PROVIDERS);
         }
@@ -76,13 +80,14 @@ class AuthController extends GetxController {
       await _userRepository.verifyPhone(smsSent.value);
       await Get.find<FireBaseMessagingService>().setDeviceToken();
       currentUser.value = await _userRepository.register(currentUser.value);
-      await _userRepository.signUpWithEmailAndPassword(currentUser.value.email  ?? "", currentUser.value.apiToken ?? "");
+      await _userRepository.signUpWithEmailAndPassword(
+          currentUser.value.email ?? "", currentUser.value.apiToken ?? "");
       loading.value = false;
       await Get.offAllNamed(Routes.E_PROVIDERS);
     } catch (e) {
       loading.value = false;
       Get.toNamed(Routes.REGISTER);
-      //Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+      Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     } finally {
       loading.value = false;
     }
@@ -100,12 +105,15 @@ class AuthController extends GetxController {
       try {
         await _userRepository.sendResetLinkEmail(currentUser.value);
         loading.value = false;
-        Get.showSnackbar(Ui.SuccessSnackBar(message: "The Password reset link has been sent to your email: ".tr + (currentUser.value.email  ?? "")));
-        Timer(Duration(seconds: 5), () {
+        Get.showSnackbar(Ui.SuccessSnackBar(
+            message: "The Password reset link has been sent to your email: "
+                .tr +
+                (currentUser.value.email ?? "")));
+        Timer(const Duration(seconds: 5), () {
           Get.offAndToNamed(Routes.LOGIN);
         });
       } catch (e) {
-       // Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
+        Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
       } finally {
         loading.value = false;
       }

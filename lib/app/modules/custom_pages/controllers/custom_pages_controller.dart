@@ -6,11 +6,7 @@ import '../../../repositories/custom_page_repository.dart';
 
 class CustomPagesController extends GetxController {
   final customPage = CustomPage().obs;
-  CustomPageRepository _customPageRepository;
-
-  CustomPagesController() {
-    _customPageRepository = CustomPageRepository();
-  }
+  CustomPageRepository _customPageRepository = CustomPageRepository();
 
   @override
   void onInit() {
@@ -36,7 +32,7 @@ class CustomPagesController extends GetxController {
 
   Future<void> getCustomPage() async {
     try {
-      customPage.value = await _customPageRepository.get(customPage.value.id);
+      customPage.value = await _customPageRepository.get(customPage.value.id!);
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }

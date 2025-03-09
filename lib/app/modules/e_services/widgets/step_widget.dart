@@ -3,19 +3,19 @@ import 'package:get/get.dart';
 
 class StepWidget extends StatelessWidget {
   const StepWidget({
-    Key key,
+    Key? key,
     this.width,
     this.height,
     this.index,
     this.color,
-    @required this.title,
+    required this.title,
   }) : super(key: key);
 
-  final double width;
-  final double height;
-  final Widget index;
-  final Color color;
-  final Widget title;
+  final double? width;
+  final double? height;
+  final Widget? index;
+  final Color? color;
+  final Widget? title;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class StepWidget extends StatelessWidget {
           child: Center(child: index),
         ),
         SizedBox(width: 10),
-        title
+        title!
       ],
     );
   }

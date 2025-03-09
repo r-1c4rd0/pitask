@@ -34,7 +34,7 @@ class HomeSearchBarWidget extends StatelessWidget implements PreferredSize {
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.fade,
-                  style: Get.textTheme.caption,
+                  style: Get.textTheme.bodySmall,
                 ),
               ),
               SizedBox(width: 8),
@@ -55,7 +55,7 @@ class HomeSearchBarWidget extends StatelessWidget implements PreferredSize {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: 4,
                     children: [
-                      Text("Filter".tr, style: Get.textTheme.bodyText2),
+                      Text("Filter".tr, style: Get.textTheme.bodyMedium),
                       Icon(
                         Icons.filter_list,
                         color: Get.theme.hintColor,

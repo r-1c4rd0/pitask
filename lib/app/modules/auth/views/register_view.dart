@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 import '../../../../common/helper.dart';
 import '../../../../common/ui.dart';
@@ -25,7 +26,7 @@ class RegisterView extends GetView<AuthController> {
         appBar: AppBar(
           title: Text(
             "Register".tr,
-            style: Get.textTheme.headline6.merge(TextStyle(color: context.theme.primaryColor)),
+            style: Get.textTheme.titleLarge!.merge(TextStyle(color: context.theme.primaryColor)),
           ),
           centerTitle: true,
           backgroundColor: Get.theme.colorScheme.secondary,
@@ -60,13 +61,13 @@ class RegisterView extends GetView<AuthController> {
                       child: Column(
                         children: [
                           Text(
-                            _settings.providerAppName,
-                            style: Get.textTheme.headline6.merge(TextStyle(color: Get.theme.primaryColor, fontSize: 24)),
+                            _settings.providerAppName!,
+                            style: Get.textTheme.titleLarge!.merge(TextStyle(color: Get.theme.primaryColor, fontSize: 24)),
                           ),
                           SizedBox(height: 5),
                           Text(
                             "Welcome to the best service provider system!".tr,
-                            style: Get.textTheme.caption.merge(TextStyle(color: Get.theme.primaryColor)),
+                            style: Get.textTheme.bodySmall!.merge(TextStyle(color: Get.theme.primaryColor)),
                             textAlign: TextAlign.center,
                           ),
                           // Text("Fill the following credentials to login your account", style: Get.textTheme.caption.merge(TextStyle(color: Get.theme.primaryColor))),
@@ -103,7 +104,7 @@ class RegisterView extends GetView<AuthController> {
                         hintText: "John Doe".tr,
                         initialValue: controller.currentUser?.value?.name,
                         onSaved: (input) => controller.currentUser.value.name = input,
-                        validator: (input) => input.length < 3 ? "Should be more than 3 characters".tr : null,
+                        validator: (input) => input!.length < 3 ? "Should be more than 3 characters".tr : null,
                         iconData: Icons.person_outline,
                         isFirst: true,
                         isLast: false,
@@ -113,7 +114,7 @@ class RegisterView extends GetView<AuthController> {
                         hintText: "johndoe@gmail.com".tr,
                         initialValue: controller.currentUser?.value?.email,
                         onSaved: (input) => controller.currentUser.value.email = input,
-                        validator: (input) => !input.contains('@') ? "Should be a valid email".tr : null,
+                        validator: (input) => !input!.contains('@') ? "Should be a valid email".tr : null,
                         iconData: Icons.alternate_email,
                         isFirst: false,
                         isLast: false,
@@ -121,13 +122,13 @@ class RegisterView extends GetView<AuthController> {
                       PhoneFieldWidget(
                         labelText: "Phone Number".tr,
                         hintText: "223 665 7896".tr,
-                        initialCountryCode: controller.currentUser?.value?.getPhoneNumber()?.countryISOCode,
-                        initialValue: controller.currentUser?.value?.getPhoneNumber()?.number,
+                        initialCountryCode: controller.currentUser?.value?.getPhoneNumber()!.countryISOCode ??'',
+                        initialValue: controller.currentUser?.value?.getPhoneNumber()?.number ??'',
                         onSaved: (phone) {
-                          return controller.currentUser.value.phoneNumber = phone.completeNumber;
+                           controller.currentUser.value.phoneNumber = phone!.completeNumber;
                         },
                         isLast: false,
-                        isFirst: false,
+                        isFirst: false, onChanged: (PhoneNumber value) {  },
                       ),
                       Obx(() {
                         return TextFieldWidget(
@@ -135,7 +136,7 @@ class RegisterView extends GetView<AuthController> {
                           hintText: "••••••••••••".tr,
                           initialValue: controller.currentUser?.value?.password,
                           onSaved: (input) => controller.currentUser.value.password = input,
-                          validator: (input) => input.length < 3 ? "Should be more than 3 characters".tr : null,
+                          validator: (input) => input!.length < 3 ? "Should be more than 3 characters".tr : null,
                           obscureText: controller.hidePassword.value,
                           iconData: Icons.lock_outline,
                           keyboardType: TextInputType.visiblePassword,
@@ -174,7 +175,7 @@ class RegisterView extends GetView<AuthController> {
                     color: Get.theme.colorScheme.secondary,
                     text: Text(
                       "Register".tr,
-                      style: Get.textTheme.headline6.merge(TextStyle(color: Get.theme.primaryColor)),
+                      style: Get.textTheme.titleLarge!.merge(TextStyle(color: Get.theme.primaryColor)),
                     ),
                   ).paddingOnly(top: 15, bottom: 5, right: 20, left: 20),
                 ),

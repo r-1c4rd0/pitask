@@ -1,14 +1,15 @@
-/*
- * Copyright (c) 2020 .
- */
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../search/controllers/search_controller.dart';
+// 🔹 Adicionando um prefixo para evitar conflitos
+import '../../modules/search/controllers/search_controller.dart' as customSearch;
+
+
 import 'circular_loading_widget.dart';
 
-class FilterBottomSheetWidget extends GetView<SearchController> {
+class FilterBottomSheetWidget extends GetView<customSearch.SearchController> {
+  const FilterBottomSheetWidget({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,7 +33,7 @@ class FilterBottomSheetWidget extends GetView<SearchController> {
                     return CircularLoadingWidget(height: 100);
                   }
                   return ExpansionTile(
-                    title: Text("Categories".tr, style: Get.textTheme.bodyText2),
+                    title: Text("Categories".tr, style: Get.textTheme.bodyMedium),
                     children: List.generate(controller.categories.length, (index) {
                       var _category = controller.categories.elementAt(index);
                       return Obx(() {
@@ -40,11 +41,11 @@ class FilterBottomSheetWidget extends GetView<SearchController> {
                           controlAffinity: ListTileControlAffinity.trailing,
                           value: controller.selectedCategories.contains(_category.id),
                           onChanged: (value) {
-                            controller.toggleCategory(value, _category);
+                            controller.toggleCategory(value ?? false, _category);
                           },
                           title: Text(
-                            _category.name,
-                            style: Get.textTheme.bodyText1,
+                            _category.name ?? '',
+                            style: Get.textTheme.bodyLarge,
                             overflow: TextOverflow.fade,
                             softWrap: false,
                             maxLines: 1,
@@ -62,15 +63,15 @@ class FilterBottomSheetWidget extends GetView<SearchController> {
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 45),
             child: Row(
               children: [
-                Expanded(child: Text("Filter".tr, style: Get.textTheme.headline5)),
+                Expanded(child: Text("Filter".tr, style: Get.textTheme.headlineSmall)),
                 MaterialButton(
                   onPressed: () {
-                    controller.searchEServices(keywords: controller.textEditingController.text);
+                    controller.searchEServices(keywords: controller.textEditingController?.text ?? '');
                     Get.back();
                   },
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   color: Get.theme.colorScheme.secondary.withOpacity(0.15),
-                  child: Text("Apply".tr, style: Get.textTheme.subtitle1),
+                  child: Text("Apply".tr, style: Get.textTheme.titleMedium),
                   elevation: 0,
                 ),
               ],
@@ -89,7 +90,6 @@ class FilterBottomSheetWidget extends GetView<SearchController> {
                 color: Get.theme.focusColor.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(3),
               ),
-              //child: SizedBox(height: 1,),
             ),
           ),
         ],

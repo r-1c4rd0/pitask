@@ -28,7 +28,7 @@ class SearchBarWidget extends StatelessWidget {
               maxLines: 1,
               softWrap: false,
               overflow: TextOverflow.fade,
-              style: Get.textTheme.caption,
+              style: Get.textTheme.bodySmall,
             ),
           ),
           SizedBox(width: 8),

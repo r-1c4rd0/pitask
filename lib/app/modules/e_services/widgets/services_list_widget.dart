@@ -8,7 +8,7 @@ import 'services_list_item_widget.dart';
 import 'services_list_loader_widget.dart';
 
 class ServicesListWidget extends GetView<EServicesController> {
-  ServicesListWidget({Key key}) : super(key: key);
+  ServicesListWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

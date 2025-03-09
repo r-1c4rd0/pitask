@@ -21,7 +21,7 @@ class PhoneVerificationView extends GetView<AuthController> {
           appBar: AppBar(
             title: Text(
               "Phone Verification".tr,
-              style: Get.textTheme.headline6.merge(TextStyle(color: context.theme.primaryColor)),
+              style: Get.textTheme.titleLarge!.merge(TextStyle(color: context.theme.primaryColor)),
             ),
             centerTitle: true,
             backgroundColor: Get.theme.colorScheme.secondary,
@@ -54,13 +54,13 @@ class PhoneVerificationView extends GetView<AuthController> {
                       child: Column(
                         children: [
                           Text(
-                            _settings.providerAppName,
-                            style: Get.textTheme.headline6.merge(TextStyle(color: Get.theme.primaryColor, fontSize: 24)),
+                            _settings.providerAppName!,
+                            style: Get.textTheme.titleLarge!.merge(TextStyle(color: Get.theme.primaryColor, fontSize: 24)),
                           ),
                           SizedBox(height: 5),
                           Text(
                             "Welcome to the best service provider system!".tr,
-                            style: Get.textTheme.caption.merge(TextStyle(color: Get.theme.primaryColor)),
+                            style: Get.textTheme.bodySmall!.merge(TextStyle(color: Get.theme.primaryColor)),
                             textAlign: TextAlign.center,
                           ),
                           // Text("Fill the following credentials to login your account", style: Get.textTheme.caption.merge(TextStyle(color: Get.theme.primaryColor))),
@@ -94,13 +94,13 @@ class PhoneVerificationView extends GetView<AuthController> {
                     children: [
                       Text(
                         "We sent the OTP code to your phone, please check it and enter below".tr,
-                        style: Get.textTheme.bodyText1,
+                        style: Get.textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ).paddingSymmetric(horizontal: 20, vertical: 20),
                       TextFieldWidget(
                         labelText: "OTP Code".tr,
                         hintText: "- - - - - -".tr,
-                        style: Get.textTheme.headline4.merge(TextStyle(letterSpacing: 8)),
+                        style: Get.textTheme.headlineMedium!.merge(TextStyle(letterSpacing: 8)),
                         textAlign: TextAlign.center,
                         keyboardType: TextInputType.number,
                         onChanged: (input) => controller.smsSent.value = input,
@@ -113,7 +113,7 @@ class PhoneVerificationView extends GetView<AuthController> {
                         color: Get.theme.colorScheme.secondary,
                         text: Text(
                           "Verify".tr,
-                          style: Get.textTheme.headline6.merge(TextStyle(color: Get.theme.primaryColor)),
+                          style: Get.textTheme.titleLarge!.merge(TextStyle(color: Get.theme.primaryColor)),
                         ),
                       ).paddingSymmetric(vertical: 30, horizontal: 20),
                       Row(

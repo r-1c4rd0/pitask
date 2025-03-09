@@ -6,15 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TabBarController extends GetxController {
-  RxString selectedId;
+  RxString selectedId = RxString("");
 
   @override
   void onInit() {
     super.onInit();
-  }
-
-  TabBarController() {
-    selectedId = RxString("");
   }
 
   bool isSelected(dynamic tabId) => selectedId.value == tabId.toString();
@@ -29,7 +25,7 @@ class TabBarController extends GetxController {
 }
 
 class TabBarWidget extends StatelessWidget implements PreferredSize {
-  TabBarWidget({Key key, @required this.tag, @required this.tabs, @required this.initialSelectedId}) {
+  TabBarWidget({Key? key, required this.tag, required this.tabs, @required this.initialSelectedId}) {
     tabs[0] = Padding(padding: EdgeInsetsDirectional.only(start: 15), child: tabs.elementAt(0));
     tabs[tabs.length - 1] = Padding(padding: EdgeInsetsDirectional.only(end: 15), child: tabs[tabs.length - 1]);
   }
@@ -102,17 +98,17 @@ class TabBarLoadingWidget extends StatelessWidget implements PreferredSize {
 
 class ChipWidget extends StatelessWidget {
   ChipWidget({
-    Key key,
-    @required this.text,
+    Key? key,
+    required this.text,
     this.onSelected,
-    @required this.tag,
-    @required this.id,
+    required this.tag,
+    required this.id,
   }) : super(key: key);
 
   final String text;
   final dynamic id;
   final String tag;
-  final ValueChanged<dynamic> onSelected;
+  final ValueChanged<dynamic>? onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +117,7 @@ class ChipWidget extends StatelessWidget {
       return RawChip(
         elevation: 0,
         label: Text(text),
-        labelStyle: controller.isSelected(this.id) ? Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.primaryColor)) : Get.textTheme.bodyText2,
+        labelStyle: controller.isSelected(this.id) ? Get.textTheme.bodyMedium!.merge(TextStyle(color: Get.theme.primaryColor)) : Get.textTheme.bodyMedium,
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         backgroundColor: Get.theme.focusColor.withOpacity(0.1),
         selectedColor: Get.theme.colorScheme.secondary,
@@ -131,7 +127,7 @@ class ChipWidget extends StatelessWidget {
         pressElevation: 0,
         onSelected: (bool value) {
           controller.toggleSelected(this.id);
-          onSelected(id);
+          onSelected!(id);
         },
       ).marginSymmetric(horizontal: 5);
     });

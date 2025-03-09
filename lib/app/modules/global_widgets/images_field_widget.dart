@@ -14,11 +14,8 @@ class ImagesFieldController extends GetxController {
   final images = <File>[].obs;
   List<String> uuids = <String>[];
   final uploading = false.obs;
-  UploadRepository _uploadRepository;
+  UploadRepository _uploadRepository = UploadRepository();
 
-  ImagesFieldController() {
-    _uploadRepository = new UploadRepository();
-  }
 
   @override
   void onInit() {
@@ -32,8 +29,8 @@ class ImagesFieldController extends GetxController {
 
   Future pickImage(ImageSource source, String field, ValueChanged<String> uploadCompleted) async {
     ImagePicker imagePicker = ImagePicker();
-    XFile pickedFile = await imagePicker.pickImage(source: source, imageQuality: 80);
-    File imageFile = File(pickedFile.path);
+    XFile? pickedFile = await imagePicker.pickImage(source: source, imageQuality: 80);
+    File imageFile = File(pickedFile!.path);
     print(imageFile);
     if (imageFile != null) {
       try {
@@ -66,23 +63,23 @@ class ImagesFieldController extends GetxController {
 
 class ImagesFieldWidget extends StatelessWidget {
   ImagesFieldWidget({
-    Key key,
-    @required this.label,
-    @required this.tag,
-    @required this.field,
+    Key? key,
+    required this.label,
+    required this.tag,
+    required this.field,
     this.placeholder,
     this.buttonText,
-    @required this.uploadCompleted,
+    required this.uploadCompleted,
     this.initialImages,
-    @required this.reset,
+    required this.reset,
   }) : super(key: key);
 
-  final String label;
-  final String placeholder;
-  final String buttonText;
-  final String tag;
-  final String field;
-  final List<Media> initialImages;
+  final String? label;
+  final String? placeholder;
+  final String? buttonText;
+  final String? tag;
+  final String? field;
+  final List<Media>? initialImages;
   final ValueChanged<String> uploadCompleted;
   final ValueChanged<List<String>> reset;
 
@@ -109,8 +106,8 @@ class ImagesFieldWidget extends StatelessWidget {
                   height: 60,
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    label,
-                    style: Get.textTheme.bodyText1,
+                    label!,
+                    style: Get.textTheme.bodyLarge,
                     textAlign: TextAlign.start,
                   ),
                 ),
@@ -122,7 +119,7 @@ class ImagesFieldWidget extends StatelessWidget {
                 },
                 shape: StadiumBorder(),
                 color: Get.theme.focusColor.withOpacity(0.1),
-                child: Text(buttonText ?? "Reset".tr, style: Get.textTheme.bodyText1),
+                child: Text(buttonText ?? "Reset".tr, style: Get.textTheme.bodyLarge),
                 elevation: 0,
                 hoverElevation: 0,
                 focusElevation: 0,
@@ -131,7 +128,7 @@ class ImagesFieldWidget extends StatelessWidget {
             ],
           ),
           Obx(() {
-            return buildImages(initialImages, controller.images);
+            return buildImages(initialImages!, controller.images);
           })
         ],
       ),
@@ -159,7 +156,7 @@ class ImagesFieldWidget extends StatelessWidget {
     thumbs.addAll(
       (initialImages
               ?.where((image) {
-                return !Uuid.isUuid(image.id);
+                return !Uuid.isUuid(image.id!);
               })
               ?.map((image) => ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -200,7 +197,7 @@ class ImagesFieldWidget extends StatelessWidget {
         else
           return GestureDetector(
             onTap: () async {
-              await controller.pickImage(ImageSource.gallery, field, uploadCompleted);
+              await controller.pickImage(ImageSource.gallery, field!, uploadCompleted);
             },
             child: Container(
               width: 100,
