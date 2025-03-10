@@ -7,8 +7,8 @@ import '../controllers/e_services_controller.dart';
 
 class EServiceOptionsPopupMenuWidget extends GetView<EServicesController> {
   const EServiceOptionsPopupMenuWidget({
-    Key key,
-    @required EService eService,
+    Key? key,
+    required EService eService,
   })  : _eService = eService,
         super(key: key);
 
@@ -113,13 +113,13 @@ class EServiceOptionsPopupMenuWidget extends GetView<EServicesController> {
           content: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                Text("This service will removed from your account".tr, style: Get.textTheme.bodyText1),
+                Text("This service will removed from your account".tr, style: Get.textTheme.bodyLarge),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text("Cancel".tr, style: Get.textTheme.bodyText1),
+              child: Text("Cancel".tr, style: Get.textTheme.bodyLarge),
               onPressed: () {
                 Get.back();
               },

@@ -9,11 +9,7 @@ class WalletController extends GetxController {
   final eProviderSubscription = new EProviderSubscription().obs;
   final wallet = new Wallet().obs;
 
-  SubscriptionRepository _subscriptionRepository;
-
-  WalletController() {
-    _subscriptionRepository = new SubscriptionRepository();
-  }
+  SubscriptionRepository _subscriptionRepository = SubscriptionRepository();
 
   @override
   void onInit() {

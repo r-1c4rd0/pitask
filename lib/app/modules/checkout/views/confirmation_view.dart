@@ -15,7 +15,7 @@ class ConfirmationView extends GetView<CheckoutController> {
       appBar: AppBar(
         title: Text(
           arguments['title'] ?? "Confirmation".tr,
-          style: context.textTheme.headline6,
+          style: context.textTheme.titleLarge,
         ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
@@ -80,7 +80,7 @@ class ConfirmationView extends GetView<CheckoutController> {
             Text(
               arguments['short_message'] ?? "Thank you!".tr,
               textAlign: TextAlign.center,
-              style: Get.textTheme.headline3,
+              style: Get.textTheme.displaySmall,
             ),
             SizedBox(height: 10),
             Opacity(
@@ -88,7 +88,7 @@ class ConfirmationView extends GetView<CheckoutController> {
               child: Text(
                 arguments['long_message'] ?? "Your subscription has been successfully submitted, you will receive a confirmation soon".tr,
                 textAlign: TextAlign.center,
-                style: Get.textTheme.headline4,
+                style: Get.textTheme.headlineMedium,
               ),
             ),
           ],
@@ -117,7 +117,7 @@ class ConfirmationView extends GetView<CheckoutController> {
                 child: Text(
                   "Home".tr,
                   textAlign: TextAlign.center,
-                  style: Get.textTheme.headline6.merge(
+                  style: Get.textTheme.titleLarge?.merge(
                     TextStyle(color: Get.theme.primaryColor),
                   ),
                 ),

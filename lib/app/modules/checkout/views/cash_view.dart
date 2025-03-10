@@ -16,17 +16,17 @@ class CashViewWidget extends GetView<CashController> {
           if (controller.isDone()) {
             return Text(
               "Payment Successful".tr,
-              style: context.textTheme.headline6,
+              style: context.textTheme.titleLarge,
             );
           } else if (controller.isFailed()) {
             return Text(
               "Payment Error".tr,
-              style: context.textTheme.headline6,
+              style: context.textTheme.titleLarge,
             );
           } else {
             return Text(
               " . . . ".tr,
-              style: context.textTheme.headline6,
+              style: context.textTheme.titleLarge,
             );
           }
         }),
@@ -110,12 +110,12 @@ class CashViewWidget extends GetView<CashController> {
               if (controller.isDone()) {
                 return Text(
                   "Thank you!".tr,
-                  style: context.textTheme.headline6,
+                  style: context.textTheme.titleLarge,
                 );
               } else if (controller.isFailed()) {
                 return Text(
                   "Payment Error".tr,
-                  style: context.textTheme.headline6,
+                  style: context.textTheme.titleLarge,
                 );
               } else {
                 return SizedBox();
@@ -129,18 +129,18 @@ class CashViewWidget extends GetView<CashController> {
                   return Text(
                     "Your payment is pending confirmation from the Service Provider".tr,
                     textAlign: TextAlign.center,
-                    style: Get.textTheme.headline4,
+                    style: Get.textTheme.headlineMedium,
                   );
                 } else if (controller.isFailed()) {
                   return Text(
                     "Error occurred".tr,
                     textAlign: TextAlign.center,
-                    style: Get.textTheme.headline4,
+                    style: Get.textTheme.headlineMedium,
                   );
                 } else {
                   return Text(
                     " . . . ".tr,
-                    style: context.textTheme.headline6,
+                    style: context.textTheme.titleLarge,
                   );
                 }
               }),
@@ -171,7 +171,7 @@ class CashViewWidget extends GetView<CashController> {
                 child: Text(
                   "Home".tr,
                   textAlign: TextAlign.center,
-                  style: Get.textTheme.headline6.merge(
+                  style: Get.textTheme.titleLarge!.merge(
                     TextStyle(color: Get.theme.primaryColor),
                   ),
                 ),

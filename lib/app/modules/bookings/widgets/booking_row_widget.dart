@@ -3,50 +3,63 @@ import 'package:get/get.dart';
 
 class BookingRowWidget extends StatelessWidget {
   const BookingRowWidget({
-    Key key,
-    @required this.description,
+    super.key,
+    required this.description,
     this.value,
     this.valueStyle,
-    this.hasDivider,
+    this.hasDivider = true,
     this.child,
-    this.descriptionFlex,
-    this.valueFlex,
-  }) : super(key: key);
+    this.descriptionFlex = 1,
+    this.valueFlex = 1,
+    this.dividerThickness = 1.0,
+    this.dividerHeight = 25.0,
+    this.spacingHeight = 6.0,
+  });
 
   final String description;
+  final String? value; // Tornamos nullable para segurança
+  final TextStyle? valueStyle;
+  final bool hasDivider;
+  final Widget? child;
   final int descriptionFlex;
   final int valueFlex;
-  final String value;
-  final Widget child;
-  final TextStyle valueStyle;
-  final bool hasDivider;
+  final double dividerThickness;
+  final double dividerHeight;
+  final double spacingHeight;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
             Expanded(
-              flex: descriptionFlex ?? 1,
+              flex: descriptionFlex,
               child: Text(
-                this.description,
-                style: Get.textTheme.bodyText1,
+                description,
+                style: Get.textTheme.bodyLarge,
               ),
             ),
             Expanded(
-                flex: valueFlex ?? 1,
-                child: child ??
-                    Text(
-                      value,
-                      style: valueStyle ?? Get.textTheme.bodyText2,
-                      maxLines: 3,
-                      textAlign: TextAlign.end,
-                    )),
+              flex: valueFlex,
+              child: child ??
+                  Text(
+                    value ?? '', // Tratamento seguro para null
+                    style: valueStyle ?? Get.textTheme.bodyMedium,
+                    maxLines: 3,
+                    textAlign: TextAlign.end,
+                  ),
+            ),
           ],
         ),
-        if (hasDivider != null && hasDivider) Divider(thickness: 1, height: 25),
-        if (hasDivider != null && !hasDivider) SizedBox(height: 6),
+        if (hasDivider)
+          Divider(
+            thickness: dividerThickness,
+            height: dividerHeight,
+          )
+        else
+          SizedBox(height: spacingHeight),
       ],
     );
   }

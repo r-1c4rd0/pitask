@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class EProviderTitleBarWidget extends StatelessWidget implements PreferredSize {
   final Widget title;
 
-  const EProviderTitleBarWidget({Key key, @required this.title}) : super(key: key);
+  const EProviderTitleBarWidget({Key? key, required this.title}) : super(key: key);
 
   Widget buildTitleBar() {
     return Container(

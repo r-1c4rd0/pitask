@@ -8,7 +8,7 @@ import 'e_providers_empty_list_widget.dart';
 import 'e_providers_list_item_widget.dart';
 
 class EProvidersListWidget extends GetView<EProvidersController> {
-  EProvidersListWidget({Key key}) : super(key: key);
+  EProvidersListWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -13,8 +13,8 @@ import 'e_provider_type_badge_widget.dart';
 
 class EProviderMainThumbWidget extends StatelessWidget {
   const EProviderMainThumbWidget({
-    Key key,
-    @required EProvider eProvider,
+    Key? key,
+    required EProvider eProvider,
   })  : _eProvider = eProvider,
         super(key: key);
 
@@ -25,7 +25,7 @@ class EProviderMainThumbWidget extends StatelessWidget {
     return Stack(
       children: [
         Hero(
-          tag: 'recommended_carousel' + _eProvider.id,
+          tag: 'recommended_carousel' + _eProvider.id!,
           child: ClipRRect(
             borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
             child: CachedNetworkImage(

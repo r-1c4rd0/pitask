@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 import '../../../../common/helper.dart';
 import '../../../models/e_provider_model.dart';
@@ -26,7 +27,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
           title: Obx(() {
             return Text(
               controller.isCreateForm() ? "New Service Provider".tr : controller.eProvider.value.name ?? '',
-              style: context.textTheme.headline6,
+              style: context.textTheme.titleLarge,
             );
           }),
           centerTitle: true,
@@ -58,7 +59,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                       );
                     },
                   );
-                  if (confirm) {
+                  if (confirm!) {
                     await controller.deleteEProvider();
                   }
                 },
@@ -79,7 +80,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
               Obx(() {
                 return Expanded(
                   child: MaterialButton(
-                    onPressed: controller.eProvider.value.addresses.isEmpty
+                    onPressed: controller.eProvider.value.addresses!.isEmpty
                         ? null
                         : () {
                             if (controller.isCreateForm()) {
@@ -93,7 +94,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                     color: Get.theme.colorScheme.secondary,
                     disabledElevation: 0,
                     disabledColor: Get.theme.focusColor,
-                    child: Text("Save & Next".tr, style: Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.primaryColor))),
+                    child: Text("Save & Next".tr, style: Get.textTheme.bodyMedium?.merge(TextStyle(color: Get.theme.primaryColor))),
                     elevation: 0,
                   ),
                 );
@@ -132,8 +133,8 @@ class EProviderFormView extends GetView<EProviderFormController> {
                     ),
                   ],
                 ),
-                Text("Provider details".tr, style: Get.textTheme.headline5).paddingOnly(top: 25, bottom: 0, right: 22, left: 22),
-                Text("Fill the following details and save them".tr, style: Get.textTheme.caption).paddingSymmetric(horizontal: 22, vertical: 5),
+                Text("Provider details".tr, style: Get.textTheme.headlineSmall).paddingOnly(top: 25, bottom: 0, right: 22, left: 22),
+                Text("Fill the following details and save them".tr, style: Get.textTheme.bodySmall).paddingSymmetric(horizontal: 22, vertical: 5),
                 Obx(() {
                   return ImagesFieldWidget(
                     label: "Images".tr,
@@ -142,27 +143,27 @@ class EProviderFormView extends GetView<EProviderFormController> {
                     initialImages: controller.eProvider.value.images,
                     uploadCompleted: (uuid) {
                       controller.eProvider.update((val) {
-                        val.images = val.images ?? [];
-                        val.images.add(new Media(id: uuid));
+                        val?.images = val.images ?? [];
+                        val?.images?.add(new Media(id: uuid));
                       });
                     },
                     reset: (uuids) {
                       controller.eProvider.update((val) {
-                        val.images.clear();
+                        val?.images?.clear();
                       });
                     },
                   );
                 }),
                 TextFieldWidget(
                   onSaved: (input) => controller.eProvider.value.name = input,
-                  validator: (input) => input.length < 3 ? "Should be more than 3 letters".tr : null,
+                  validator: (input) => input!.length < 3 ? "Should be more than 3 letters".tr : null,
                   initialValue: controller.eProvider.value.name,
                   hintText: "Architect Mayer Group".tr,
                   labelText: "Name".tr,
                 ),
                 TextFieldWidget(
                   onSaved: (input) => controller.eProvider.value.description = input,
-                  validator: (input) => input.length < 3 ? "Should be more than 3 letters".tr : null,
+                  validator: (input) => input!.length < 3 ? "Should be more than 3 letters".tr : null,
                   keyboardType: TextInputType.multiline,
                   initialValue: controller.eProvider.value.description,
                   hintText: "Description for Architect Mayer Group".tr,
@@ -171,29 +172,29 @@ class EProviderFormView extends GetView<EProviderFormController> {
                 PhoneFieldWidget(
                   labelText: "Phone Number".tr,
                   hintText: "223 665 7896".tr,
-                  initialCountryCode: Helper.getPhoneNumber(controller.eProvider.value.phoneNumber)?.countryISOCode,
+                  initialCountryCode: Helper.getPhoneNumber(controller.eProvider.value.phoneNumber)!.countryISOCode,
                   initialValue: Helper.getPhoneNumber(controller.eProvider.value.phoneNumber)?.number,
                   onSaved: (phone) {
-                    return controller.eProvider.value.phoneNumber = phone.completeNumber;
-                  },
+                     controller.eProvider.value.phoneNumber = phone!.completeNumber;
+                  }, onChanged: (PhoneNumber value) {  },
                 ),
                 PhoneFieldWidget(
                   labelText: "Mobile Number".tr,
                   hintText: "223 665 7896".tr,
-                  initialCountryCode: Helper.getPhoneNumber(controller.eProvider.value.mobileNumber)?.countryISOCode,
+                  initialCountryCode: Helper.getPhoneNumber(controller.eProvider.value.mobileNumber)!.countryISOCode,
                   initialValue: Helper.getPhoneNumber(controller.eProvider.value.mobileNumber)?.number,
                   onSaved: (phone) {
-                    return controller.eProvider.value.mobileNumber = phone.completeNumber;
-                  },
+                     controller.eProvider.value.mobileNumber = phone?.completeNumber;
+                  }, onChanged: (PhoneNumber value) {  },
                 ),
                 TextFieldWidget(
-                  onSaved: (input) => controller.eProvider.value.availabilityRange = double.tryParse(input) ?? 0,
-                  validator: (input) => (double.tryParse(input) ?? 0) <= 0 ? "Should be more than 0".tr : null,
+                  onSaved: (input) => controller.eProvider.value.availabilityRange = double.tryParse(input!) ?? 0,
+                  validator: (input) => (double.tryParse(input!) ?? 0) <= 0 ? "Should be more than 0".tr : null,
                   initialValue: controller.eProvider.value.availabilityRange?.toString() ?? null,
                   keyboardType: TextInputType.numberWithOptions(signed: false, decimal: true),
                   hintText: "5".tr,
                   labelText: "Availability Range".tr,
-                  suffix: Text(Get.find<SettingsService>().setting.value.distanceUnit.tr),
+                  suffix: Text(Get.find<SettingsService>().setting.value.distanceUnit!.tr),
                 ),
                 Obx(() {
                   if (controller.eProviderTypes.isEmpty)
@@ -217,7 +218,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                               Expanded(
                                 child: Text(
                                   "Provider Types".tr,
-                                  style: Get.textTheme.bodyText1,
+                                  style: Get.textTheme.bodyLarge,
                                   textAlign: TextAlign.start,
                                 ),
                               ),
@@ -239,12 +240,12 @@ class EProviderFormView extends GetView<EProviderFormController> {
                                     },
                                   );
                                   controller.eProvider.update((val) {
-                                    val.type = selectedValue;
+                                    val?.type = selectedValue;
                                   });
                                 },
                                 shape: StadiumBorder(),
                                 color: Get.theme.colorScheme.secondary.withOpacity(0.1),
-                                child: Text("Select".tr, style: Get.textTheme.subtitle1),
+                                child: Text("Select".tr, style: Get.textTheme.titleMedium),
                                 elevation: 0,
                                 hoverElevation: 0,
                                 focusElevation: 0,
@@ -258,7 +259,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                                 padding: EdgeInsets.symmetric(vertical: 20),
                                 child: Text(
                                   "Select providers".tr,
-                                  style: Get.textTheme.caption,
+                                  style: Get.textTheme.bodySmall,
                                 ),
                               );
                             } else {
@@ -288,7 +289,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                             Expanded(
                               child: Text(
                                 "Employees".tr,
-                                style: Get.textTheme.bodyText1,
+                                style: Get.textTheme.bodyLarge,
                                 textAlign: TextAlign.start,
                               ),
                             ),
@@ -311,12 +312,12 @@ class EProviderFormView extends GetView<EProviderFormController> {
                                   },
                                 );
                                 controller.eProvider.update((val) {
-                                  val.employees = selectedValues?.toList();
+                                  val?.employees = selectedValues?.toList();
                                 });
                               },
                               shape: StadiumBorder(),
                               color: Get.theme.colorScheme.secondary.withOpacity(0.1),
-                              child: Text("Select".tr, style: Get.textTheme.subtitle1),
+                              child: Text("Select".tr, style: Get.textTheme.titleMedium),
                               elevation: 0,
                               hoverElevation: 0,
                               focusElevation: 0,
@@ -330,7 +331,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                               padding: EdgeInsets.symmetric(vertical: 20),
                               child: Text(
                                 "Select Employees".tr,
-                                style: Get.textTheme.caption,
+                                style: Get.textTheme.bodySmall,
                               ),
                             );
                           } else {
@@ -358,7 +359,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                           Expanded(
                             child: Text(
                               "Taxes".tr,
-                              style: Get.textTheme.bodyText1,
+                              style: Get.textTheme.bodyLarge,
                               textAlign: TextAlign.start,
                             ),
                           ),
@@ -381,12 +382,12 @@ class EProviderFormView extends GetView<EProviderFormController> {
                                 },
                               );
                               controller.eProvider.update((val) {
-                                val.taxes = selectedValues?.toList();
+                                val?.taxes = selectedValues?.toList();
                               });
                             },
                             shape: StadiumBorder(),
                             color: Get.theme.colorScheme.secondary.withOpacity(0.1),
-                            child: Text("Select".tr, style: Get.textTheme.subtitle1),
+                            child: Text("Select".tr, style: Get.textTheme.titleMedium),
                             elevation: 0,
                             hoverElevation: 0,
                             focusElevation: 0,
@@ -400,7 +401,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
                             padding: EdgeInsets.symmetric(vertical: 20),
                             child: Text(
                               "Select Taxes".tr,
-                              style: Get.textTheme.caption,
+                              style: Get.textTheme.bodySmall,
                             ),
                           );
                         } else {
@@ -424,10 +425,10 @@ class EProviderFormView extends GetView<EProviderFormController> {
           spacing: 5,
           runSpacing: 8,
           children: List.generate(_eProvider.employees?.length ?? 0, (index) {
-            final _user = _eProvider.employees.elementAt(index);
+            final _user = _eProvider.employees?.elementAt(index);
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              child: Text(_user.name, style: Get.textTheme.bodyText1.merge(TextStyle(color: Get.theme.colorScheme.secondary))),
+              child: Text(_user!.name!, style: Get.textTheme.bodyLarge!.merge(TextStyle(color: Get.theme.colorScheme.secondary))),
               decoration: BoxDecoration(
                   color: Get.theme.colorScheme.secondary.withOpacity(0.2),
                   border: Border.all(
@@ -447,10 +448,10 @@ class EProviderFormView extends GetView<EProviderFormController> {
           spacing: 5,
           runSpacing: 8,
           children: List.generate(_eProvider.taxes?.length ?? 0, (index) {
-            final tax = _eProvider.taxes.elementAt(index);
+            final tax = _eProvider.taxes?.elementAt(index);
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              child: Text(tax.name, style: Get.textTheme.bodyText1.merge(TextStyle(color: Get.theme.colorScheme.secondary))),
+              child: Text(tax!.name!, style: Get.textTheme.bodyLarge!.merge(TextStyle(color: Get.theme.colorScheme.secondary))),
               decoration: BoxDecoration(
                   color: Get.theme.colorScheme.secondary.withOpacity(0.2),
                   border: Border.all(
@@ -467,7 +468,7 @@ class EProviderFormView extends GetView<EProviderFormController> {
       padding: EdgeInsets.symmetric(vertical: 10),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 4),
-        child: Text(_eProvider.type?.name ?? '', style: Get.textTheme.bodyText2),
+        child: Text(_eProvider.type?.name ?? '', style: Get.textTheme.bodyMedium),
         decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20))),
       ),
     );

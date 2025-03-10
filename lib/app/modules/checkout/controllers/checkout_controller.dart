@@ -10,27 +10,31 @@ import '../../../repositories/payment_repository.dart';
 import '../../../routes/app_routes.dart';
 
 class CheckoutController extends GetxController {
-  PaymentRepository _paymentRepository;
+  final PaymentRepository _paymentRepository = PaymentRepository();
   final paymentsList = <PaymentMethod>[].obs;
-  final walletList = <Wallet>[];
+  final walletList = <Wallet>[].obs;
   final isLoading = true.obs;
-  final eProviderSubscription = new EProviderSubscription().obs;
-  Rx<PaymentMethod> selectedPaymentMethod = new PaymentMethod().obs;
-
-  CheckoutController() {
-    _paymentRepository = new PaymentRepository();
-  }
+  final eProviderSubscription = EProviderSubscription().obs;
+  Rx<PaymentMethod> selectedPaymentMethod = PaymentMethod().obs;
 
   @override
-  void onInit() async {
-    eProviderSubscription.value = Get.arguments as EProviderSubscription;
-    await loadPaymentMethodsList();
-    await loadWalletList();
-    selectedPaymentMethod.value = this.paymentsList.firstWhere((element) => element.isDefault);
+  void onInit() {
     super.onInit();
+    eProviderSubscription.value = Get.arguments as EProviderSubscription;
+
+    // Carregar métodos de pagamento e carteiras de forma assíncrona
+    ever(isLoading, (_) async {
+      await loadPaymentMethodsList();
+      await loadWalletList();
+      if (paymentsList.isNotEmpty) {
+        selectedPaymentMethod.value = paymentsList.firstWhere((element) => element.isDefault ?? false, orElse: () => paymentsList.first);
+      }
+    });
+
+    isLoading.value = true;
   }
 
-  Future loadPaymentMethodsList() async {
+  Future<void> loadPaymentMethodsList() async {
     try {
       paymentsList.assignAll(await _paymentRepository.getMethods());
     } catch (e) {
@@ -38,16 +42,16 @@ class CheckoutController extends GetxController {
     }
   }
 
-  Future loadWalletList() async {
+  Future<void> loadWalletList() async {
     try {
-      var _walletIndex = paymentsList.indexWhere((element) => element.route.toLowerCase() == Routes.WALLET);
-      if (_walletIndex > -1) {
-        // wallet payment method enabled
-        // remove existing wallet method
-        var _walletPaymentMethod = paymentsList.removeAt(_walletIndex);
+      int walletIndex = paymentsList.indexWhere((element) => element.route?.toLowerCase() == Routes.WALLET);
+      if (walletIndex > -1) {
+        // Método de pagamento via carteira está ativado
+        var walletPaymentMethod = paymentsList.removeAt(walletIndex);
         walletList.assignAll(await _paymentRepository.getWallets());
-        // and replace it with new payment method object
-        _insertWalletsPaymentMethod(_walletIndex, _walletPaymentMethod);
+
+        // Substituir pelo novo método de pagamento
+        _insertWalletsPaymentMethod(walletIndex, walletPaymentMethod);
         paymentsList.refresh();
       }
     } catch (e) {
@@ -61,54 +65,58 @@ class CheckoutController extends GetxController {
     selectedPaymentMethod.value = paymentMethod;
   }
 
-  void paySubscription(EProviderSubscription _eProviderSubscription) async {
+  void paySubscription(EProviderSubscription subscription) {
     try {
-      _eProviderSubscription.payment = new Payment(paymentMethod: selectedPaymentMethod.value);
+      subscription.payment = Payment(paymentMethod: selectedPaymentMethod.value);
       if (selectedPaymentMethod.value.route != null) {
-        Get.offAndToNamed(selectedPaymentMethod.value.route.toLowerCase(),
-            arguments: {'eProviderSubscription': _eProviderSubscription, 'wallet': selectedPaymentMethod.value.wallet});
+        Get.offAndToNamed(
+          selectedPaymentMethod.value.route!.toLowerCase(),
+          arguments: {
+            'eProviderSubscription': subscription,
+            'wallet': selectedPaymentMethod.value.wallet
+          },
+        );
       }
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
   }
 
-  TextStyle getTitleTheme(PaymentMethod paymentMethod) {
+  TextStyle? getTitleTheme(PaymentMethod paymentMethod) {
     if (paymentMethod == selectedPaymentMethod.value) {
-      return Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.primaryColor));
-    } else if (paymentMethod.wallet != null && paymentMethod.wallet.balance < eProviderSubscription.value.subscriptionPackage.getPrice) {
-      return Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.focusColor));
+      return Get.textTheme.bodyMedium?.merge(TextStyle(color: Get.theme.primaryColor));
+    } else if (paymentMethod.wallet != null &&
+        (paymentMethod.wallet!.balance ?? 0) < (eProviderSubscription.value.subscriptionPackage?.getPrice ?? 0)) {
+      return Get.textTheme.bodyMedium?.merge(TextStyle(color: Get.theme.focusColor));
     }
-    return Get.textTheme.bodyText2;
+    return Get.textTheme.bodyMedium;
   }
 
-  TextStyle getSubTitleTheme(PaymentMethod paymentMethod) {
+  TextStyle? getSubTitleTheme(PaymentMethod paymentMethod) {
     if (paymentMethod == selectedPaymentMethod.value) {
-      return Get.textTheme.caption.merge(TextStyle(color: Get.theme.primaryColor));
+      return Get.textTheme.bodySmall?.merge(TextStyle(color: Get.theme.primaryColor));
     }
-    return Get.textTheme.caption;
+    return Get.textTheme.bodySmall;
   }
 
-  Color getColor(PaymentMethod paymentMethod) {
-    if (paymentMethod == selectedPaymentMethod.value) {
-      return Get.theme.colorScheme.secondary;
-    }
-    return null;
+  Color? getColor(PaymentMethod paymentMethod) {
+    return paymentMethod == selectedPaymentMethod.value ? Get.theme.colorScheme.secondary : null;
   }
 
-  void _insertWalletsPaymentMethod(int _walletIndex, PaymentMethod _walletPaymentMethod) {
-    walletList.forEach((_walletElement) {
+  void _insertWalletsPaymentMethod(int walletIndex, PaymentMethod walletPaymentMethod) {
+    for (var walletElement in walletList) {
       paymentsList.insert(
-          _walletIndex,
-          new PaymentMethod(
-            isDefault: _walletPaymentMethod.isDefault,
-            id: _walletPaymentMethod.id,
-            name: _walletElement.getName(),
-            description: _walletElement.balance.toString(),
-            logo: _walletPaymentMethod.logo,
-            route: _walletPaymentMethod.route,
-            wallet: _walletElement,
-          ));
-    });
+        walletIndex,
+        PaymentMethod(
+          isDefault: walletPaymentMethod.isDefault,
+          id: walletPaymentMethod.id,
+          name: walletElement.getName(),
+          description: walletElement.balance?.toString(),
+          logo: walletPaymentMethod.logo,
+          route: walletPaymentMethod.route,
+          wallet: walletElement,
+        ),
+      );
+    }
   }
 }

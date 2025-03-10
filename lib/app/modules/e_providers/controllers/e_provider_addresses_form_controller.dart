@@ -11,11 +11,8 @@ class EProviderAddressesFormController extends GetxController {
   final addresses = <Address>[].obs;
   final eProvider = EProvider().obs;
   GlobalKey<FormState> eProviderAddressesForm = new GlobalKey<FormState>();
-  EProviderRepository _eProviderRepository;
+  EProviderRepository _eProviderRepository= EProviderRepository();
 
-  EProviderAddressesFormController() {
-    _eProviderRepository = new EProviderRepository();
-  }
 
   @override
   void onInit() async {
@@ -24,7 +21,7 @@ class EProviderAddressesFormController extends GetxController {
       eProvider.value = arguments['eProvider'] as EProvider;
     }
     eProvider.value.addresses = eProvider.value.addresses ?? <Address>[];
-    addresses.assignAll(eProvider.value.addresses);
+    addresses.assignAll(eProvider.value.addresses!);
     super.onInit();
   }
 
@@ -38,14 +35,14 @@ class EProviderAddressesFormController extends GetxController {
     await getEProvider();
     await getAddresses();
     if (showMessage) {
-      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name + " " + "page refreshed successfully".tr));
+      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name! + " " + "page refreshed successfully".tr));
     }
   }
 
   Future getEProvider() async {
     if (eProvider.value.hasData) {
       try {
-        eProvider.value = await _eProviderRepository.get(eProvider.value.id);
+        eProvider.value = await _eProviderRepository.get(eProvider.value.id!);
       } catch (e) {
         Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
       }
@@ -81,7 +78,7 @@ class EProviderAddressesFormController extends GetxController {
 
   Future<void> deleteAddress(Address address) async {
     try {
-      address = await _eProviderRepository.deleteAddress(address);
+      await _eProviderRepository.deleteAddress(address);
       addresses.removeWhere((element) => element.id == address.id);
       toggleAddress(false, address);
     } catch (e) {
@@ -92,9 +89,9 @@ class EProviderAddressesFormController extends GetxController {
   void toggleAddress(bool value, Address address) {
     eProvider.update((val) {
       if (value) {
-        val.addresses.add(address);
+        val!.addresses!.add(address);
       } else {
-        val.addresses.removeWhere((element) => element == address);
+        val!.addresses!.removeWhere((element) => element == address);
       }
     });
   }

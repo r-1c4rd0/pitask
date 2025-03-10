@@ -12,11 +12,7 @@ class EServiceController extends GetxController {
   final optionGroups = <OptionGroup>[].obs;
   final currentSlide = 0.obs;
   final heroTag = ''.obs;
-  EServiceRepository _eServiceRepository;
-
-  EServiceController() {
-    _eServiceRepository = new EServiceRepository();
-  }
+  EServiceRepository _eServiceRepository = EServiceRepository();
 
   @override
   void onInit() async {
@@ -37,13 +33,13 @@ class EServiceController extends GetxController {
     await getReviews();
     await getOptionGroups();
     if (showMessage) {
-      Get.showSnackbar(Ui.SuccessSnackBar(message: eService.value.name + " " + "page refreshed successfully".tr));
+      Get.showSnackbar(Ui.SuccessSnackBar(message: eService.value.name! + " " + "page refreshed successfully".tr));
     }
   }
 
   Future getEService() async {
     try {
-      eService.value = await _eServiceRepository.get(eService.value.id);
+      eService.value = await _eServiceRepository.get(eService.value.id!);
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
@@ -51,7 +47,7 @@ class EServiceController extends GetxController {
 
   Future getReviews() async {
     try {
-      reviews.assignAll(await _eServiceRepository.getReviews(eService.value.id));
+      reviews.assignAll(await _eServiceRepository.getReviews(eService.value.id!));
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
@@ -59,9 +55,9 @@ class EServiceController extends GetxController {
 
   Future getOptionGroups() async {
     try {
-      var _optionGroups = await _eServiceRepository.getOptionGroups(eService.value.id);
+      var _optionGroups = await _eServiceRepository.getOptionGroups(eService.value.id!);
       optionGroups.assignAll(_optionGroups.map((element) {
-        element.options.removeWhere((option) => option.eServiceId != eService.value.id);
+        element.options!.removeWhere((option) => option.eServiceId != eService.value.id);
         return element;
       }));
     } catch (e) {

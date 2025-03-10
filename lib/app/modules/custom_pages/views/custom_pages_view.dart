@@ -20,8 +20,8 @@ class CustomPagesView extends GetView<CustomPagesController> {
         appBar: AppBar(
           title: Obx(() {
             return Text(
-              controller.customPage.value.title.tr,
-              style: Get.textTheme.headline6,
+              controller.customPage.value.title!.tr,
+              style: Get.textTheme.titleLarge,
             );
           }),
           centerTitle: true,
@@ -42,7 +42,7 @@ class CustomPagesView extends GetView<CustomPagesController> {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Obx(() {
-              if (controller.customPage.value.content.isEmpty) {
+              if (controller.customPage.value.content!.isEmpty) {
                 return CustomPageLoadingWidget();
               } else {
                 return Padding(

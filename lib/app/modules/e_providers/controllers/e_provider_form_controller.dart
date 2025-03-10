@@ -23,14 +23,8 @@ class EProviderFormController extends GetxController {
   final taxes = <Tax>[].obs;
   final eProviderTypes = <EProviderType>[].obs;
   GlobalKey<FormState> eProviderForm = new GlobalKey<FormState>();
-  EProviderRepository _eProviderRepository;
-  CategoryRepository _categoryRepository;
-
-  EProviderFormController() {
-    _eProviderRepository = new EProviderRepository();
-    _categoryRepository = new CategoryRepository();
-  }
-
+  EProviderRepository _eProviderRepository= EProviderRepository();
+  CategoryRepository _categoryRepository = CategoryRepository();
   @override
   void onInit() async {
     var arguments = Get.arguments as Map<String, dynamic>;
@@ -51,7 +45,7 @@ class EProviderFormController extends GetxController {
     await getEmployees();
     await getTaxes();
     if (showMessage) {
-      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name + " " + "page refreshed successfully".tr));
+      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name! + " " + "page refreshed successfully".tr));
     }
   }
 
@@ -97,19 +91,19 @@ class EProviderFormController extends GetxController {
 
   List<MultiSelectDialogItem<User>> getMultiSelectEmployeesItems() {
     return employees.map((element) {
-      return MultiSelectDialogItem(element, element.name);
+      return MultiSelectDialogItem(element, element.name!);
     }).toList();
   }
 
   List<MultiSelectDialogItem<Tax>> getMultiSelectTaxesItems() {
     return taxes.map((element) {
-      return MultiSelectDialogItem(element, element.name);
+      return MultiSelectDialogItem(element, element.name!);
     }).toList();
   }
 
   List<SelectDialogItem<EProviderType>> getSelectProviderTypesItems() {
     return eProviderTypes.map((element) {
-      return SelectDialogItem(element, element.name);
+      return SelectDialogItem(element, element.name!);
     }).toList();
   }
 
@@ -121,10 +115,10 @@ class EProviderFormController extends GetxController {
   }
 
   void createEProviderForm() async {
-    Get.focusScope.unfocus();
-    if (eProviderForm.currentState.validate()) {
+    Get.focusScope?.unfocus();
+    if (eProviderForm.currentState!.validate()) {
       try {
-        eProviderForm.currentState.save();
+        eProviderForm.currentState?.save();
         final _eProvider = await _eProviderRepository.create(eProvider.value);
         eProvider.value.id = _eProvider.id;
         await Get.toNamed(Routes.E_PROVIDER_AVAILABILITY_FORM, arguments: {'eProvider': _eProvider});
@@ -137,10 +131,11 @@ class EProviderFormController extends GetxController {
   }
 
   void updateEProviderForm() async {
-    Get.focusScope.unfocus();
-    if (eProviderForm.currentState.validate()) {
+    Get.focusScope?.unfocus();
+    if (eProviderForm.currentState!.validate()) {
       try {
-        eProviderForm.currentState.save();
+        eProviderForm.currentState?.save();
+
         final _eProvider = await _eProviderRepository.update(eProvider.value);
         await Get.toNamed(Routes.E_PROVIDER_AVAILABILITY_FORM, arguments: {'eProvider': _eProvider});
       } catch (e) {
@@ -155,7 +150,7 @@ class EProviderFormController extends GetxController {
     try {
       await _eProviderRepository.delete(eProvider.value);
       Get.offNamedUntil(Routes.E_PROVIDERS, (route) => route.settings.name == Routes.E_PROVIDERS);
-      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name + " " + "has been removed".tr));
+      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name! + " " + "has been removed".tr));
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }

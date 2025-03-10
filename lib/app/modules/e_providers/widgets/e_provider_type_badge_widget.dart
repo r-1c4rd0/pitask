@@ -12,8 +12,8 @@ import '../../../models/e_provider_model.dart';
 
 class EProviderTypeBadgeWidget extends StatelessWidget {
   const EProviderTypeBadgeWidget({
-    Key key,
-    @required EProvider eProvider,
+    Key? key,
+    required EProvider eProvider,
   })  : _eProvider = eProvider,
         super(key: key);
 
@@ -25,7 +25,7 @@ class EProviderTypeBadgeWidget extends StatelessWidget {
       margin: EdgeInsetsDirectional.only(start: 12, top: 10),
       child: Text(_eProvider.type?.name ?? '',
           maxLines: 1,
-          style: Get.textTheme.bodyText2.merge(
+          style: Get.textTheme.bodyMedium!.merge(
             TextStyle(color: Get.theme.primaryColor, height: 1.4, fontSize: 10),
           ),
           softWrap: false,

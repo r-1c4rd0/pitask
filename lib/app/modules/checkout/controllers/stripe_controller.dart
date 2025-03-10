@@ -8,31 +8,44 @@ import '../../../routes/app_routes.dart';
 import '../../../services/global_service.dart';
 
 class StripeController extends GetxController {
-  WebViewController webView;
-  PaymentRepository _paymentRepository;
+  late final WebViewController webViewController; // ✅ Inicialização correta
+  final PaymentRepository _paymentRepository = PaymentRepository();
   final url = "".obs;
   final progress = 0.0.obs;
-  final eProviderSubscription = new EProviderSubscription().obs;
-
-  StripeController() {
-    _paymentRepository = new PaymentRepository();
-  }
+  final eProviderSubscription = EProviderSubscription().obs;
 
   @override
   void onInit() {
+    super.onInit();
+
     eProviderSubscription.value = Get.arguments['eProviderSubscription'] as EProviderSubscription;
     getUrl();
-    super.onInit();
+
+    // ✅ Inicializa o WebViewController corretamente
+    webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageStarted: (String newUrl) {
+          url.value = newUrl;
+          showConfirmationIfSuccess();
+        },
+        onProgress: (int newProgress) {
+          progress.value = newProgress / 100;
+        },
+      ));
   }
 
   void getUrl() {
     url.value = _paymentRepository.getStripeUrl(eProviderSubscription.value);
-    print(url.value);
+    print("Stripe URL: ${url.value}");
+
+    // ✅ Carrega a URL após inicializar o WebViewController
+    webViewController.loadRequest(Uri.parse(url.value.isNotEmpty ? url.value : "about:blank"));
   }
 
   void showConfirmationIfSuccess() {
     final _doneUrl = "${Helper.toUrl(Get.find<GlobalService>().baseUrl)}subscription/payments/stripe";
-    if (url == _doneUrl) {
+    if (url.value.contains(_doneUrl)) {
       Get.toNamed(Routes.CONFIRMATION, arguments: {
         'title': "Payment Successful".tr,
         'long_message': "Your Payment is Successful".tr,

@@ -8,7 +8,7 @@ import 'services_empty_list_widget.dart';
 import 'services_list_loader_widget.dart';
 
 class ServicesListWidget extends GetView<EProviderEServicesController> {
-  ServicesListWidget({Key key}) : super(key: key);
+  ServicesListWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -5,9 +5,9 @@ import '../../../models/availability_hour_model.dart';
 
 class AvailabilityHourItemWidget extends StatelessWidget {
   const AvailabilityHourItemWidget({
-    Key key,
-    @required MapEntry<String, List<AvailabilityHour>> availabilityHour,
-    @required List<String> data,
+    Key? key,
+    required MapEntry<String, List<AvailabilityHour>> availabilityHour,
+    required List<String> data,
   })  : _availabilityHour = availabilityHour,
         _data = data,
         super(key: key);
@@ -28,7 +28,7 @@ class AvailabilityHourItemWidget extends StatelessWidget {
                 List.generate(_data.length, (index) {
                   return Text(
                     _data.elementAt(index),
-                    style: Get.textTheme.caption,
+                    style: Get.textTheme.bodySmall,
                   );
                 }),
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +42,7 @@ class AvailabilityHourItemWidget extends StatelessWidget {
               width: 125,
               child: Text(
                 _hour.toDuration(),
-                style: Get.textTheme.bodyText1,
+                style: Get.textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
               decoration: BoxDecoration(

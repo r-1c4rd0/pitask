@@ -18,7 +18,7 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
         appBar: AppBar(
           title: Text(
             "Provider Addresses".tr,
-            style: context.textTheme.headline6,
+            style: context.textTheme.titleLarge,
           ),
           centerTitle: true,
           backgroundColor: Colors.transparent,
@@ -54,7 +54,7 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
               Expanded(
                 child: Obx(() {
                   return MaterialButton(
-                    onPressed: controller.eProvider.value.addresses.isEmpty
+                    onPressed: controller.eProvider.value.addresses!.isEmpty
                         ? null
                         : () async {
                             await Get.toNamed(Routes.E_PROVIDER_FORM, arguments: {'eProvider': controller.eProvider.value});
@@ -64,7 +64,7 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
                     disabledElevation: 0,
                     disabledColor: Get.theme.focusColor,
                     color: Get.theme.colorScheme.secondary,
-                    child: Text("Save & Next".tr, style: Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.primaryColor))),
+                    child: Text("Save & Next".tr, style: Get.textTheme.bodyMedium?.merge(TextStyle(color: Get.theme.primaryColor))),
                     elevation: 0,
                   );
                 }),
@@ -103,8 +103,8 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
                 ),
               ],
             ),
-            Text("Addresses details".tr, style: Get.textTheme.headline5).paddingOnly(top: 25, bottom: 0, right: 22, left: 22),
-            Text("Select from your addresses".tr, style: Get.textTheme.caption).paddingSymmetric(horizontal: 22, vertical: 5),
+            Text("Addresses details".tr, style: Get.textTheme.headlineSmall).paddingOnly(top: 25, bottom: 0, right: 22, left: 22),
+            Text("Select from your addresses".tr, style: Get.textTheme.bodySmall).paddingSymmetric(horizontal: 22, vertical: 5),
             Obx(() {
               return Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -112,7 +112,7 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
                 child: (controller.addresses.isEmpty)
                     ? Shimmer.fromColors(
                         baseColor: Colors.grey.withOpacity(0.15),
-                        highlightColor: Colors.grey[200].withOpacity(0.1),
+                        highlightColor: Colors.grey[200]!.withOpacity(0.1),
                         child: Container(
                           width: double.infinity,
                           height: 220,
@@ -126,7 +126,7 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                            child: MapsUtil.getStaticMaps(controller.eProvider.value.addresses.map((e) => e.getLatLng()).toList()),
+                            child: MapsUtil.getStaticMaps(controller.eProvider.value.addresses!.map((e) => e.getLatLng()).toList()),
                           ),
                           Container(
                             padding: EdgeInsetsDirectional.only(top: 20, start: 20, end: 5),
@@ -158,7 +158,7 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
                                           ),
                                           value: controller.eProvider.value?.addresses?.contains(_address) ?? false,
                                           onChanged: (value) {
-                                            controller.toggleAddress(value, _address);
+                                            controller.toggleAddress(value!, _address);
                                           },
                                         ),
                                       );
@@ -168,9 +168,9 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(_address.getDescription, style: Get.textTheme.subtitle2),
+                                          Text(_address.getDescription, style: Get.textTheme.titleSmall),
                                           SizedBox(height: 5),
-                                          Text(_address.address, style: Get.textTheme.caption),
+                                          Text(_address.address!, style: Get.textTheme.bodySmall),
                                         ],
                                       ),
                                     ),
@@ -201,7 +201,7 @@ class EProviderAddressesFormView extends GetView<EProviderAddressesFormControlle
                                                 cancelText: "Cancel".tr);
                                           },
                                         );
-                                        if (confirm && _address.hasData) {
+                                        if (confirm! && _address.hasData) {
                                           await controller.deleteAddress(_address);
                                         }
                                       },

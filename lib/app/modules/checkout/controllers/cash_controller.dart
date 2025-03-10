@@ -7,11 +7,9 @@ import '../../../repositories/subscription_repository.dart';
 class CashController extends GetxController {
   final eProviderSubscription = new EProviderSubscription().obs;
 
-  SubscriptionRepository _subscriptionRepository;
+  SubscriptionRepository _subscriptionRepository =  SubscriptionRepository();
 
-  CashController() {
-    _subscriptionRepository = new SubscriptionRepository();
-  }
+
 
   @override
   void onInit() {

@@ -5,15 +5,15 @@ import '../widgets/step_widget.dart';
 
 class HorizontalStepperWidget extends StatelessWidget {
   const HorizontalStepperWidget({
-    Key key,
+    Key? key,
     this.steps,
     this.padding,
     this.controller,
   }) : super(key: key);
 
-  final List<StepWidget> steps;
-  final EdgeInsets padding;
-  final ScrollController controller;
+  final List<StepWidget>? steps;
+  final EdgeInsets? padding;
+  final ScrollController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +26,10 @@ class HorizontalStepperWidget extends StatelessWidget {
         primary: false,
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        children: List.generate(steps.length, (index) {
-          if (index < steps.length - 1)
+        children: List.generate(steps!.length, (index) {
+          if (index < steps!.length - 1)
             return Row(children: [
-              steps.elementAt(index),
+              steps!.elementAt(index),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: SizedBox(
@@ -42,7 +42,7 @@ class HorizontalStepperWidget extends StatelessWidget {
               ),
             ]);
           else
-            return steps.elementAt(index);
+            return steps!.elementAt(index);
         }),
       ),
     );

@@ -13,8 +13,8 @@ import 'e_provider_main_thumb_widget.dart';
 
 class EProvidersListItemWidget extends StatelessWidget {
   const EProvidersListItemWidget({
-    Key key,
-    @required EProvider eProvider,
+    Key? key,
+    required EProvider eProvider,
   })  : _eProvider = eProvider,
         super(key: key);
 
@@ -46,12 +46,12 @@ class EProvidersListItemWidget extends StatelessWidget {
                   Text(
                     _eProvider.name ?? '',
                     maxLines: 2,
-                    style: Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.hintColor)),
+                    style: Get.textTheme.bodyMedium?.merge(TextStyle(color: Get.theme.hintColor)),
                   ),
                   Text(
                     _eProvider.description ?? '',
                     maxLines: 3,
-                    style: Get.textTheme.bodyText1,
+                    style: Get.textTheme.bodyLarge,
                   ),
                   SizedBox(height: 8),
                   Wrap(

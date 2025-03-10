@@ -21,11 +21,7 @@ class EProviderController extends GetxController {
   final featuredEServices = <EService>[].obs;
   final currentSlide = 0.obs;
   String heroTag = "";
-  EProviderRepository _eProviderRepository;
-
-  EProviderController() {
-    _eProviderRepository = new EProviderRepository();
-  }
+  EProviderRepository _eProviderRepository = EProviderRepository();
 
   @override
   void onInit() {
@@ -49,13 +45,13 @@ class EProviderController extends GetxController {
     await getGalleries();
     await getReviews();
     if (showMessage) {
-      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name + " " + "page refreshed successfully".tr));
+      Get.showSnackbar(Ui.SuccessSnackBar(message: eProvider.value.name! + " " + "page refreshed successfully".tr));
     }
   }
 
   Future getEProvider() async {
     try {
-      eProvider.value = await _eProviderRepository.get(eProvider.value.id);
+      eProvider.value = await _eProviderRepository.get(eProvider.value.id!);
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
@@ -71,7 +67,7 @@ class EProviderController extends GetxController {
 
   Future getReviews() async {
     try {
-      reviews.assignAll(await _eProviderRepository.getReviews(eProvider.value.id));
+      reviews.assignAll(await _eProviderRepository.getReviews(eProvider.value.id!));
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
@@ -79,7 +75,7 @@ class EProviderController extends GetxController {
 
   Future getAwards() async {
     try {
-      awards.assignAll(await _eProviderRepository.getAwards(eProvider.value.id));
+      awards.assignAll(await _eProviderRepository.getAwards(eProvider.value.id!));
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
@@ -87,7 +83,7 @@ class EProviderController extends GetxController {
 
   Future getExperiences() async {
     try {
-      experiences.assignAll(await _eProviderRepository.getExperiences(eProvider.value.id));
+      experiences.assignAll(await _eProviderRepository.getExperiences(eProvider.value.id!));
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
     }
@@ -95,10 +91,10 @@ class EProviderController extends GetxController {
 
   Future getGalleries() async {
     try {
-      final _galleries = await _eProviderRepository.getGalleries(eProvider.value.id);
+      final _galleries = await _eProviderRepository.getGalleries(eProvider.value.id!);
       galleries.assignAll(_galleries.map((e) {
-        e.image.name = e.description;
-        return e.image;
+        e.image!.name = e.description;
+        return e.image!;
       }));
     } catch (e) {
       Get.showSnackbar(Ui.ErrorSnackBar(message: e.toString()));
@@ -106,8 +102,8 @@ class EProviderController extends GetxController {
   }
 
   void startChat() {
-    List<User> _employees = eProvider.value.employees.map((e) {
-      e.avatar = eProvider.value.images[0];
+    List<User> _employees = eProvider.value.employees!.map((e) {
+      e.avatar = eProvider.value.images?[0];
       return e;
     }).toList();
     Message _message = new Message(_employees, name: eProvider.value.name);

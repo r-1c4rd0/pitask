@@ -96,7 +96,7 @@ class Theme1AppPages {
     GetPage(name: Routes.E_PROVIDERS, page: () => EProvidersView(), binding: EProvidersBinding(), middlewares: [AuthMiddleware()]),
     GetPage(name: Routes.E_PROVIDER_FORM, page: () => EProviderFormView(), binding: EProviderBinding(), middlewares: [AuthMiddleware()]),
     GetPage(name: Routes.E_PROVIDER_ADDRESSES_FORM, page: () => EProviderAddressesFormView(), binding: EProviderBinding(), middlewares: [AuthMiddleware()]),
-    GetPage(name: Routes.E_PROVIDER_ADDRESS_PICKER, page: () => AddressPickerView(), binding: EProviderBinding(), middlewares: [AuthMiddleware()]),
+    //GetPage(name: Routes.E_PROVIDER_ADDRESS_PICKER, page: () => AddressPickerView(), binding: EProviderBinding(), middlewares: [AuthMiddleware()]),
     GetPage(name: Routes.E_PROVIDER_AVAILABILITY_FORM, page: () => EProviderAvailabilityFormView(), binding: EProviderBinding(), middlewares: [AuthMiddleware()]),
 /*    GetPage(name: Routes.AWARD_FORM, page: () => AwardFormView(), binding: EProviderBinding(),middlewares: [AuthMiddleware()]),
     GetPage(name: Routes.EXPERIENCE_FORM, page: () => ExperienceFormView(), binding: EProviderBinding(),middlewares: [AuthMiddleware()]),

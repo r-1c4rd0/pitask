@@ -181,7 +181,7 @@ class Ui {
         TextAlign textAlign = TextAlign.start,
         bool softWrap = true,
         TextOverflow overflow = TextOverflow.clip,
-        int? maxLines,
+        int? maxLines,  Alignment? alignment,
       }) {
     if (htmlString == null || htmlString.isEmpty) {
       return const Text('');

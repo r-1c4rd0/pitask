@@ -7,6 +7,25 @@ import '../controllers/flutterwave_controller.dart';
 class FlutterWaveViewWidget extends GetView<FlutterWaveController> {
   @override
   Widget build(BuildContext context) {
+    // Criando o WebViewController antes da construção do Widget
+    final WebViewController webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (String url) {
+            controller.url.value = url;
+            controller.showConfirmationIfSuccess();
+          },
+          onPageFinished: (String url) {
+            controller.progress.value = 1;
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(controller.url.value));
+
+    // Associando ao Controller
+    controller.webView = webViewController;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -14,43 +33,32 @@ class FlutterWaveViewWidget extends GetView<FlutterWaveController> {
         centerTitle: true,
         title: Text(
           "FlutterWave Payment".tr,
-          style: Get.textTheme.headline6.merge(TextStyle(letterSpacing: 1.3)),
+          style: Get.textTheme.titleLarge,
         ),
         automaticallyImplyLeading: false,
-        leading: new IconButton(
-          icon: new Icon(Icons.arrow_back_ios, color: Get.theme.hintColor),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Get.theme.hintColor),
           onPressed: () => Get.back(),
         ),
       ),
       body: Stack(
         children: <Widget>[
+          // WebView agora usa WebViewWidget
           Obx(() {
-            return WebView(
-                initialUrl: controller.url.value,
-                javascriptMode: JavascriptMode.unrestricted,
-                onWebViewCreated: (WebViewController _con) {
-                  controller.webView = _con;
-                },
-                onPageStarted: (String url) {
-                  controller.url.value = url;
-                  controller.showConfirmationIfSuccess();
-                },
-                onPageFinished: (String url) {
-                  controller.progress.value = 1;
-                });
+            return WebViewWidget(controller: webViewController);
           }),
+
+          // Indicador de progresso
           Obx(() {
-            if (controller.progress.value < 1) {
-              return SizedBox(
-                height: 3,
-                child: LinearProgressIndicator(
-                  backgroundColor: Get.theme.colorScheme.secondary.withOpacity(0.2),
-                ),
-              );
-            } else {
-              return SizedBox();
-            }
-          })
+            return controller.progress.value < 1
+                ? SizedBox(
+              height: 3,
+              child: LinearProgressIndicator(
+                backgroundColor: Get.theme.colorScheme.secondary.withOpacity(0.2),
+              ),
+            )
+                : SizedBox();
+          }),
         ],
       ),
     );

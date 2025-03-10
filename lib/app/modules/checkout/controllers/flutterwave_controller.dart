@@ -8,15 +8,12 @@ import '../../../routes/app_routes.dart';
 import '../../../services/global_service.dart';
 
 class FlutterWaveController extends GetxController {
-  WebViewController webView;
-  PaymentRepository _paymentRepository;
+  late final WebViewController webView;
+  PaymentRepository _paymentRepository = PaymentRepository();
   final url = "".obs;
   final progress = 0.0.obs;
   final eProviderSubscription = new EProviderSubscription().obs;
 
-  FlutterWaveController() {
-    _paymentRepository = new PaymentRepository();
-  }
 
   @override
   void onInit() {

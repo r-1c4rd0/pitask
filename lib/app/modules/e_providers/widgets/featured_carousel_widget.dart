@@ -39,14 +39,14 @@ class FeaturedCarouselWidget extends GetWidget<EProviderController> {
                   child: Column(
                     children: [
                       Hero(
-                        tag: 'featured_carousel' + _service.id,
+                        tag: 'featured_carousel' + _service.id!,
                         child: ClipRRect(
                           borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                           child: CachedNetworkImage(
                             height: 140,
                             width: double.infinity,
                             fit: BoxFit.cover,
-                            imageUrl: _service.firstImageUrl,
+                            imageUrl: _service.firstImageUrl!,
                             placeholder: (context, url) => Image.asset(
                               'assets/img/loading.gif',
                               fit: BoxFit.cover,
@@ -72,7 +72,7 @@ class FeaturedCarouselWidget extends GetWidget<EProviderController> {
                             Text(
                               _service.name ?? '',
                               maxLines: 2,
-                              style: Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.hintColor)),
+                              style: Get.textTheme.bodyMedium?.merge(TextStyle(color: Get.theme.hintColor)),
                             ),
                             Wrap(
                               children: Ui.getStarsList(_service.rate),
@@ -86,7 +86,7 @@ class FeaturedCarouselWidget extends GetWidget<EProviderController> {
                               children: [
                                 Text(
                                   "Start from".tr,
-                                  style: Get.textTheme.caption,
+                                  style: Get.textTheme.bodySmall,
                                 ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -94,12 +94,12 @@ class FeaturedCarouselWidget extends GetWidget<EProviderController> {
                                     if (_service.getOldPrice > 0)
                                       Ui.getPrice(
                                         _service.getOldPrice,
-                                        style: Get.textTheme.bodyText1.merge(TextStyle(color: Get.theme.focusColor, decoration: TextDecoration.lineThrough)),
+                                        style: Get.textTheme.bodyLarge?.merge(TextStyle(color: Get.theme.focusColor, decoration: TextDecoration.lineThrough)),
                                         unit: _service.getUnit,
                                       ),
                                     Ui.getPrice(
                                       _service.getPrice,
-                                      style: Get.textTheme.bodyText2.merge(TextStyle(color: Get.theme.colorScheme.secondary)),
+                                      style: Get.textTheme.bodyMedium!.merge(TextStyle(color: Get.theme.colorScheme.secondary)),
                                       unit: _service.getUnit,
                                     ),
                                   ],
